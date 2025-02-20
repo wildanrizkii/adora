@@ -10,7 +10,10 @@ import {
   FiShoppingCart,
   FiTag,
   FiUsers,
+  FiBox,
 } from "react-icons/fi";
+import { AiOutlineProduct } from "react-icons/ai";
+import { FaRegFileAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
@@ -112,37 +115,37 @@ const Sidebar = ({ open, setOpen, selected, setSelected }) => {
           open={open}
         />
         <Option
-          Icon={FiDollarSign}
-          title="Sales"
+          Icon={AiOutlineProduct}
+          title="Products"
           selected={selected}
           setSelected={setSelected}
           open={open}
           notifs={3}
         />
         <Option
-          Icon={FiMonitor}
-          title="View Site"
+          Icon={FiBox}
+          title="Suppliers"
           selected={selected}
           setSelected={setSelected}
           open={open}
         />
         <Option
           Icon={FiTag}
-          title="Tags"
+          title="Transactions"
           selected={selected}
           setSelected={setSelected}
           open={open}
         />
         <Option
-          Icon={FiBarChart}
-          title="Analytics"
+          Icon={FaRegFileAlt}
+          title="Report"
           selected={selected}
           setSelected={setSelected}
           open={open}
         />
         <Option
           Icon={FiUsers}
-          title="Members"
+          title="Account"
           selected={selected}
           setSelected={setSelected}
           open={open}
