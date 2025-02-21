@@ -16,10 +16,14 @@ import {
   FiTag,
   FiUsers,
   FiBox,
+  FiLogOut,
 } from "react-icons/fi";
+import { unstableSetRender, Avatar, Space, Dropdown, Badge, Tabs } from "antd";
+import { createRoot } from "react-dom/client";
 import { AiOutlineProduct, AiOutlineLogout } from "react-icons/ai";
 import { FaRegFileAlt, FaCloud } from "react-icons/fa";
 import { WiStars } from "react-icons/wi";
+import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { HiMiniChevronUpDown } from "react-icons/hi2";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +31,16 @@ import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
 
 dayjs.locale("id");
+
+unstableSetRender((node, container) => {
+  container._reactRoot ||= createRoot(container);
+  const root = container._reactRoot;
+  root.render(node);
+  return async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    root.unmount();
+  };
+});
 
 const DefaultLayout = ({ title, content }) => {
   const [mounted, setMounted] = useState(false);
@@ -76,8 +90,9 @@ const DefaultLayout = ({ title, content }) => {
 
 const Header = () => {
   const theme = ThemeToggler();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showTheme, setShowTheme] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const handleResize = () => {
@@ -93,6 +108,26 @@ const Header = () => {
   const getFormattedDate = () => {
     return dayjs().format("dddd, D MMMM YYYY");
   };
+
+  const ringAnimation = {
+    initial: { rotate: 0 },
+    animate: isHovering
+      ? {
+          rotate: [0, -15, 15, -10, 10, -5, 5, 0], // Gerakan berdering ke kiri dan kanan
+          transition: {
+            duration: 0.8,
+            ease: "easeInOut",
+            repeat: 1, // Ulang sekali saat hover
+          },
+        }
+      : {},
+  };
+
+  const iconColor = isHovering
+    ? "#FACC15" // Kuning saat hover
+    : resolvedTheme === "dark"
+    ? "#D1D5DB" // Abu muda untuk dark theme (gray-300)
+    : "#6B7280"; // Abu muda untuk light theme (gray-500)
 
   return (
     <motion.header
@@ -117,51 +152,147 @@ const Header = () => {
         </motion.span>
 
         {/* Animasi untuk profil */}
-        <div className="relative">
-          <motion.span
-            className="cursor-pointer"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            initial={{ opacity: 0.4, x: 0 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            Admin
-          </motion.span>
-
+        <div className="relative flex items-center space-x-3">
           {/* Dropdown */}
           <AnimatePresence>
-            {isDropdownOpen && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.1 }}
-                className="absolute right-0 mt-3 w-48 rounded-lg border border-zinc-100 bg-white dark:border-transparent dark:bg-zinc-700 shadow-lg z-50"
-              >
-                <div className="p-4">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Admin
-                  </p>
-                  {/* Role */}
+            <Dropdown
+              trigger={["click"]}
+              placement="bottomRight"
+              arrow
+              align={{
+                offset: [3, 18], // Tetap sejajar dengan container
+              }}
+              className="text-zinc-700 cursor-pointer"
+              dropdownRender={() => (
+                <div
+                  className="w-72 h-96 dark:bg-zinc-700 bg-white rounded-md p-4 shadow-lg border"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <h3 className="text-lg font-semibold text-center mb-4">
+                    Notifications
+                  </h3>
+                  <div className="space-y-2 overflow-y-auto h-[calc(100%-40px)]">
+                    <div className="bg-zinc-200 dark:bg-zinc-600 rounded-md p-2">
+                      New message received
+                    </div>
+                    <div className="bg-zinc-200 dark:bg-zinc-600 rounded-md p-2">
+                      Your balance is updated
+                    </div>
+                    <div className="bg-zinc-200 dark:bg-zinc-600 rounded-md p-2">
+                      Reminder: Budget review
+                    </div>
+                  </div>
                 </div>
-                <hr className="border-gray-200 dark:border-zinc-600" />
-                <div className="grid p-4 justify-center">
-                  <button
-                    className="flex gap-1 p-2 rounded-md items-center text-sm bg-red-500 text-white"
-                    onClick={() => {
-                      // Logika logout
-                      console.log("Logged out");
-                      setIsDropdownOpen(false); // Tutup dropdown setelah logout
-                    }}
+              )}
+            >
+              <div className="w-8 h-8 flex items-center justify-center">
+                {" "}
+                {/* Container tetap */}
+                <motion.div
+                  className="cursor-pointer p-1 pt-1.5"
+                  onMouseEnter={() => setIsHovering(true)}
+                  onMouseLeave={() => setIsHovering(false)}
+                  {...ringAnimation}
+                >
+                  <motion.svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="26"
+                    height="26"
+                    viewBox="0 0 26 26"
+                    fill={iconColor}
+                    whileHover={{ scale: 1.2 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   >
-                    <AiOutlineLogout size={22} />
-                    Sign out
-                  </button>
-                </div>
-              </motion.div>
-            )}
+                    <path d="M12 24a2.5 2.5 0 0 1-2.5-2.5h5A2.5 2.5 0 0 1 12 24zm8.485-5H3.515c-.583 0-1.063-.448-1.116-1.026-.05-.55.288-1.05.821-1.212C4.057 15.56 5 14.07 5 12V9c0-3.614 2.499-6.641 6-7.412V1a1 1 0 0 1 2 0v.588C16.501 2.359 19 5.386 19 9v3c0 2.07.943 3.56 2.78 4.762.533.162.871.662.821 1.212-.053.578-.533 1.026-1.116 1.026z" />
+                  </motion.svg>
+                </motion.div>
+              </div>
+            </Dropdown>
           </AnimatePresence>
+
+          <AnimatePresence>
+            <Dropdown
+              trigger={["click"]}
+              placement="bottomRight"
+              arrow
+              className="rounded-full shadow-lg"
+              dropdownRender={() => {
+                return (
+                  <div
+                    className="cursor-default dark:bg-zinc-700 rounded-md p-6 shadow-lg min-w-xs border"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex justify-center mb-4">
+                      {true?.user?.image ? (
+                        <Avatar
+                          shape="circle"
+                          size={80}
+                          src={
+                            "https://api.dicebear.com/9.x/micah/svg?clip=true"
+                          }
+                          className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
+                        />
+                      ) : (
+                        <Avatar
+                          shape="circle"
+                          size={80}
+                          src={
+                            "https://api.dicebear.com/9.x/micah/svg?clip=true"
+                          }
+                          className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
+                        />
+                      )}
+                    </div>
+                    <div className="space-y-8">
+                      <div
+                        className="cursor-default text-center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <h1 className="font-semibold dark:text-white">
+                          John Doe
+                        </h1>
+                        <h1 className="font-normal dark:text-white">Admin</h1>
+                      </div>
+
+                      <div className="flex space-x-2">
+                        <Link href="/pengaturan/akun" className="flex-grow">
+                          <div className="flex shadow-md justify-center items-center p-3 gap-1 border text-indigo-600 hover:text-white bg-indigo-600 border-indigo-600 hover:border-indigo-700 hover:bg-indigo-700 rounded-md cursor-pointer transition-colors h-full">
+                            {/* <SettingOutlined /> */}
+                            <h1 className="mb-0.5 text-white ">
+                              Pengaturan Akun
+                            </h1>
+                          </div>
+                        </Link>
+                        <div
+                          className="flex shadow-md w-14 justify-center items-center p-4 gap-1 text-white text-lg bg-red-500 hover:bg-red-600 rounded-md cursor-pointer transition-colors"
+                          onClick={() => signOut()}
+                        >
+                          <FiLogOut />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }}
+            >
+              <Avatar
+                shape="circle"
+                size={42}
+                src={"https://api.dicebear.com/9.x/micah/svg?clip=true"}
+                style={{ cursor: "pointer" }}
+                onClick={(e) => e.stopPropagation()}
+                className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
+              />
+            </Dropdown>
+          </AnimatePresence>
+          {/* <motion.div
+            className="w-20 text-left overflow-hidden whitespace-nowrap"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            John Doe
+          </motion.div> */}
         </div>
       </div>
     </motion.header>
@@ -447,9 +578,7 @@ const ToggleClose = ({ open, setOpen }) => {
             className={`transition-transform ${open && "rotate-180"}`}
           />
         </motion.div>
-        {open && (
-          <span className="text-md font-medium pt-0.5">Hide sidebar</span>
-        )}
+        {open && <span className="text-md font-medium pt-0.5">Hide</span>}
       </div>
     </motion.button>
   );
@@ -466,10 +595,22 @@ const Content = ({ content }) => {
 const ThemeToggler = () => {
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isCooldown, setIsCooldown] = useState(false); // ✅ State untuk delay
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleClick = () => {
+    if (isCooldown) return;
+
+    setIsCooldown(true);
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+
+    setTimeout(() => {
+      setIsCooldown(false);
+    }, 1000);
+  };
 
   if (!mounted) return null;
 
@@ -482,9 +623,9 @@ const ThemeToggler = () => {
                       : "bg-gradient-to-r from-sky-400 to-blue-500"
                   }`}
       style={{
-        boxShadow: "inset 4px 2px 4px rgba(0, 0, 0, 0.2)", // Inner shadow
+        boxShadow: "inset 4px 2px 4px rgba(0, 0, 0, 0.2)",
       }}
-      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      onClick={handleClick}
       layout
     >
       {/* Latar belakang bintang (mode dark) */}
