@@ -15,11 +15,259 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-plus-jakarta-sans), sans-serif;
 }
 
 [data-theme='dark'],
 [data-theme='dark'] body {
   color: #fff;
   background: #000;
+}
+
+.dark .custom-table tr.ant-table-row:not(.ant-table-expanded-row):not(.ant-table-placeholder):not(.ant-table-row-selected) {
+  background-color: #1b1b1d !important;
+  color: #ffffff !important;
+}
+
+.dark .custom-table tr.ant-table-row-selected {
+  background-color: #333333 !important;
+  color: #ffffff !important;
+}
+
+
+.dark .ant-input::placeholder,
+[data-theme='dark'] .ant-input::placeholder {
+  color: #ffffff !important;
+  opacity: 0.7;
+}
+
+.custom-table .ant-table-thead>tr>th {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.custom-table .ant-table-tbody>tr>td {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Hover pada tema light */
+.custom-table .ant-table-tbody>tr:hover>td {
+  background-color: #f5f5f5;
+  /* Abu terang */
+  cursor: pointer;
+}
+
+/* Hover pada tema dark */
+.dark .custom-table .ant-table-tbody>tr:hover>td,
+[data-theme='dark'] .custom-table .ant-table-tbody>tr:hover>td {
+  background-color: #333333;
+  /* Abu gelap */
+  cursor: pointer;
+}
+
+/* Default Pagination */
+.custom-table .ant-pagination-item,
+.custom-table .ant-pagination-prev,
+.custom-table .ant-pagination-next {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid #d9d9d9;
+}
+
+/* DARK MODE - Pagination Arrow */
+.dark .custom-table .ant-pagination-prev .anticon,
+.dark .custom-table .ant-pagination-next .anticon,
+[data-theme='dark'] .custom-table .ant-pagination-prev .anticon,
+[data-theme='dark'] .custom-table .ant-pagination-next .anticon {
+  color: #ffffff !important;
+  /* Warna putih */
+}
+
+/* Hover pada panah */
+.dark .custom-table .ant-pagination-prev:hover .anticon,
+.dark .custom-table .ant-pagination-next:hover .anticon,
+[data-theme='dark'] .custom-table .ant-pagination-prev:hover .anticon,
+[data-theme='dark'] .custom-table .ant-pagination-next:hover .anticon {
+  color: #8a2be2 !important;
+  /* Warna ungu saat hover */
+}
+
+
+/* Hover Pagination */
+.custom-table .ant-pagination-item:hover,
+.custom-table .ant-pagination-prev:hover,
+.custom-table .ant-pagination-next:hover {
+  background-color: #f5f5f5;
+  color: var(--foreground);
+}
+
+/* Active Pagination */
+.custom-table .ant-pagination-item-active {
+  background-color: var(--background);
+  color: var(--foreground);
+  border-color: #1890ff;
+}
+
+/* DARK MODE */
+/* Pagination Item */
+.dark .custom-table .ant-pagination-item,
+.dark .custom-table .ant-pagination-prev,
+.dark .custom-table .ant-pagination-next,
+[data-theme='dark'] .custom-table .ant-pagination-item,
+[data-theme='dark'] .custom-table .ant-pagination-prev,
+[data-theme='dark'] .custom-table .ant-pagination-next {
+  background-color: var(--background);
+  /* Background abu gelap */
+  color: #ffffff;
+  /* Teks putih */
+  border: 1px solid #ffffff;
+  /* Border putih */
+}
+
+/* DARK MODE - Text Angka Pagination */
+.dark .custom-table .ant-pagination-item a,
+[data-theme='dark'] .custom-table .ant-pagination-item a {
+  color: var(--foreground);
+  /* Teks putih */
+}
+
+/* Hover pada angka */
+.dark .custom-table .ant-pagination-item a:hover,
+[data-theme='dark'] .custom-table .ant-pagination-item a:hover {
+  color: #8a2be2 !important;
+  /* Ungu saat hover */
+}
+
+/* Aktif (halaman yang dipilih) */
+.dark .custom-table .ant-pagination-item-active a,
+[data-theme='dark'] .custom-table .ant-pagination-item-active a {
+  color: #8a2be2 !important;
+  /* Ungu untuk halaman aktif */
+}
+
+/* Hover di Dark Mode */
+.dark .custom-table .ant-pagination-item:hover,
+.dark .custom-table .ant-pagination-prev:hover,
+.dark .custom-table .ant-pagination-next:hover,
+[data-theme='dark'] .custom-table .ant-pagination-item:hover,
+[data-theme='dark'] .custom-table .ant-pagination-prev:hover,
+[data-theme='dark'] .custom-table .ant-pagination-next:hover {
+  background-color: #999999;
+  /* Background abu terang saat hover */
+  color: #ffffff;
+}
+
+/* Active Pagination di Dark Mode */
+.dark .custom-table .ant-pagination-item-active,
+[data-theme='dark'] .custom-table .ant-pagination-item-active {
+  background-color: #ffffff;
+  /* Background putih */
+  color: #1b1b1d;
+  /* Teks hitam */
+  border-color: #ffffff;
+  /* Border putih */
+}
+
+/* Default Icon Panah */
+.custom-table .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis,
+.custom-table .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis {
+  color: var(--foreground);
+  /* Gunakan warna teks utama */
+}
+
+/* Hover Icon Panah */
+.custom-table .ant-pagination-jump-prev:hover .ant-pagination-item-container .ant-pagination-item-ellipsis,
+.custom-table .ant-pagination-jump-next:hover .ant-pagination-item-container .ant-pagination-item-ellipsis {
+  color: #555555;
+  /* Warna abu saat hover */
+}
+
+/* DARK MODE */
+.dark .custom-table .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis,
+.dark .custom-table .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis,
+[data-theme='dark'] .custom-table .ant-pagination-jump-prev .ant-pagination-item-container .ant-pagination-item-ellipsis,
+[data-theme='dark'] .custom-table .ant-pagination-jump-next .ant-pagination-item-container .ant-pagination-item-ellipsis {
+  color: #ffffff;
+  /* Ikon putih */
+}
+
+/* Hover di Dark Mode */
+.dark .custom-table .ant-pagination-jump-prev:hover .ant-pagination-item-container .ant-pagination-item-ellipsis,
+.dark .custom-table .ant-pagination-jump-next:hover .ant-pagination-item-container .ant-pagination-item-ellipsis,
+[data-theme='dark'] .custom-table .ant-pagination-jump-prev:hover .ant-pagination-item-container .ant-pagination-item-ellipsis,
+[data-theme='dark'] .custom-table .ant-pagination-jump-next:hover .ant-pagination-item-container .ant-pagination-item-ellipsis {
+  color: #aaaaaa;
+  /* Ikon abu terang saat hover */
+}
+
+/* Background jumlah page */
+.custom-table .ant-select-selector {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-color: var(--foreground) !important;
+}
+
+/* Hover pada dropdown */
+.custom-table .ant-select-dropdown {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+/* Dropdown item default */
+.custom-table .ant-select-item {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+}
+
+/* Hover pada item */
+.custom-table .ant-select-item-option-active {
+  background-color: rgba(230, 54, 54, 0.459) !important;
+  /* Ungu transparan */
+  color: var(--foreground) !important;
+}
+
+/* DARK MODE - Pop Confirm */
+.dark .ant-popover-inner {
+  background-color: #4f4f57 !important;
+  /* Background dark */
+  color: #ffffff !important;
+  /* Teks putih */
+}
+
+.dark .ant-popover-title {
+  color: #ffffff !important;
+  /* Warna judul putih */
+}
+
+.dark .ant-popover-inner-content {
+  color: #ffffff !important;
+  /* Warna teks konten putih */
+}
+
+/* Tombol Pop Confirm */
+.dark .ant-btn-primary {
+  background-color: #ff0000 !important;
+  /* Tombol utama ungu */
+  border-color: #ff0000 !important;
+}
+
+.dark .ant-btn-default {
+  background-color: #333333 !important;
+  /* Tombol default abu gelap */
+  border-color: #ffffff !important;
+  color: #ffffff !important;
+}
+
+/* DARK MODE - Table Selected & Focused Row */
+.dark .custom-table .ant-table-tbody>tr.ant-table-row-selected,
+.dark .custom-table .ant-table-tbody>tr:focus-within {
+  background-color: #333333 !important;
+  /* Warna abu gelap untuk selected */
+  color: #ffffff !important;
+}
+
+/* Hover tetap abu gelap */
+.dark .custom-table .ant-table-tbody>tr:hover {
+  background-color: #444444 !important;
 }

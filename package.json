@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
+    "@supabase/supabase-js": "^2.48.1",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.4.7",
     "lucide-react": "^0.475.0",

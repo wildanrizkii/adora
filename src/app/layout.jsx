@@ -1,15 +1,12 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import { ConfigProvider } from "antd";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta-sans",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata = {
@@ -24,14 +21,20 @@ export const viewport = {
   userScalable: false,
 };
 
+const theme = {
+  token: {
+    colorPrimary: "#8a2be2", // Ungu
+    colorPrimaryHover: "#7a22c9",
+    colorPrimaryActive: "#6b1faf",
+  },
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning={true}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${plusJakartaSans.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light">
-          {children}
+          <ConfigProvider theme={theme}>{children}</ConfigProvider>
         </ThemeProvider>
       </body>
     </html>

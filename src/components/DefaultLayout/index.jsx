@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { useMediaQuery } from "react-responsive";
 import Link from "next/link";
 import dayjs from "dayjs";
@@ -17,6 +17,10 @@ import {
   FiUsers,
   FiBox,
   FiLogOut,
+  FiEdit,
+  FiTrash,
+  FiShare,
+  FiPlusSquare,
 } from "react-icons/fi";
 import { unstableSetRender, Avatar, Space, Dropdown, Badge, Tabs } from "antd";
 import { createRoot } from "react-dom/client";
@@ -26,6 +30,7 @@ import { WiStars } from "react-icons/wi";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { HiMiniChevronUpDown } from "react-icons/hi2";
+import { BsShop } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
@@ -58,16 +63,23 @@ const DefaultLayout = ({ title, content }) => {
 
   return (
     mounted && (
-      <div className="flex min-h-screen overflow-hidden">
-        <Sidebar
-          open={open}
-          setOpen={setOpen}
-          selected={selected}
-          setSelected={setSelected}
-        />
+      <div className="flex min-h-screen">
+        {/* Create a wrapper div for sidebar that preserves space */}
+        <div
+          className="shrink-0 transition-all duration-300"
+          style={{ width: open ? "225px" : "64px" }}
+        >
+          <Sidebar
+            open={open}
+            setOpen={setOpen}
+            selected={selected}
+            setSelected={setSelected}
+          />
+        </div>
+
         <motion.div
           layout
-          className="flex-1 flex flex-col"
+          className="flex-1 flex flex-col min-h-screen"
           animate={{
             marginLeft: 0,
             transition: { duration: 0.3, ease: "easeInOut" },
@@ -92,6 +104,7 @@ const Header = () => {
   const theme = ThemeToggler();
   const [showTheme, setShowTheme] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { resolvedTheme } = useTheme();
 
   useEffect(() => {
@@ -103,6 +116,14 @@ const Header = () => {
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const getFormattedDate = () => {
@@ -132,8 +153,12 @@ const Header = () => {
   return (
     <motion.header
       layout
-      className="h-16 flex items-center justify-between px-6 pt-2 sticky top-0 z-10"
-      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className={`h-16 flex items-center justify-between px-6 sticky top-0 z-10 ${
+        scrolled
+          ? "bg-transparent backdrop-blur-sm shadow-md"
+          : "bg-white dark:bg-zinc-900 "
+      }`}
+      transition={{ duration: 0.6, ease: "easeInOut" }}
     >
       <h1 className="font-medium text-xs sm:text-lg line-clamp-2">
         {getFormattedDate()}
@@ -154,7 +179,12 @@ const Header = () => {
         {/* Animasi untuk profil */}
         <div className="relative flex items-center space-x-3">
           {/* Dropdown */}
-          <AnimatePresence>
+          <motion.span
+            initial={{ opacity: 0.3, x: 0 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ display: showTheme ? "inline" : "none" }}
+          >
             <Dropdown
               trigger={["click"]}
               placement="bottomRight"
@@ -165,7 +195,7 @@ const Header = () => {
               className="text-zinc-700 cursor-pointer"
               dropdownRender={() => (
                 <div
-                  className="w-72 h-96 dark:bg-zinc-700 bg-white rounded-md p-4 shadow-lg border"
+                  className="w-64 h-96 dark:bg-zinc-700 bg-white rounded-md p-4 shadow-lg border"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <h3 className="text-lg font-semibold text-center mb-4">
@@ -186,7 +216,6 @@ const Header = () => {
               )}
             >
               <div className="w-8 h-8 flex items-center justify-center">
-                {" "}
                 {/* Container tetap */}
                 <motion.div
                   className="cursor-pointer p-1 pt-1.5"
@@ -208,9 +237,14 @@ const Header = () => {
                 </motion.div>
               </div>
             </Dropdown>
-          </AnimatePresence>
+          </motion.span>
 
-          <AnimatePresence>
+          <motion.span
+            initial={{ opacity: 0.3, x: 0 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ display: showTheme ? "inline" : "none" }}
+          >
             <Dropdown
               trigger={["click"]}
               placement="bottomRight"
@@ -219,7 +253,7 @@ const Header = () => {
               dropdownRender={() => {
                 return (
                   <div
-                    className="cursor-default dark:bg-zinc-700 rounded-md p-6 shadow-lg min-w-xs border"
+                    className="cursor-default bg-white dark:bg-zinc-700 rounded-md p-6 shadow-lg min-w-xs border"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex justify-center mb-4">
@@ -228,7 +262,7 @@ const Header = () => {
                           shape="circle"
                           size={80}
                           src={
-                            "https://api.dicebear.com/9.x/micah/svg?clip=true"
+                            "https://api.dicebear.com/9.x/miniavs/svg?backgroundType=gradientLinear,solid"
                           }
                           className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
                         />
@@ -237,7 +271,7 @@ const Header = () => {
                           shape="circle"
                           size={80}
                           src={
-                            "https://api.dicebear.com/9.x/micah/svg?clip=true"
+                            "https://api.dicebear.com/9.x/miniavs/svg?backgroundType=gradientLinear,solid"
                           }
                           className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
                         />
@@ -278,13 +312,15 @@ const Header = () => {
               <Avatar
                 shape="circle"
                 size={42}
-                src={"https://api.dicebear.com/9.x/micah/svg?clip=true"}
+                src={
+                  "https://api.dicebear.com/9.x/miniavs/svg?backgroundType=gradientLinear,solid"
+                }
                 style={{ cursor: "pointer" }}
                 onClick={(e) => e.stopPropagation()}
                 className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
               />
             </Dropdown>
-          </AnimatePresence>
+          </motion.span>
           {/* <motion.div
             className="w-20 text-left overflow-hidden whitespace-nowrap"
             initial={{ opacity: 0 }}
@@ -303,7 +339,7 @@ const Footer = () => {
   return (
     <motion.footer
       layout
-      className="h-14 bg-transparent shadow-sm flex items-center justify-center mt-auto"
+      className="h-6 bg-transparent shadow-sm flex items-center justify-center mt-auto"
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
       <p className="text-xs">
@@ -358,7 +394,11 @@ const Sidebar = ({ open, setOpen, selected, setSelected }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 50);
+
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -369,10 +409,10 @@ const Sidebar = ({ open, setOpen, selected, setSelected }) => {
   }, [pathname, setSelected]);
 
   const sidebarClass = mounted
-    ? `sticky top-0 min-h-screen shrink-0 ${
+    ? `fixed top-0 left-0 h-full shrink-0 ${
         resolvedTheme === "dark" ? "shadow-md shadow-zinc-800" : "shadow-lg"
-      } p-3`
-    : "sticky top-0 min-h-screen shrink-0 shadow-lg p-3";
+      } p-3 z-50 bg-white dark:bg-zinc-900`
+    : "fixed top-0 left-0 h-full shrink-0 shadow-lg p-3 z-50 bg-white dark:bg-zinc-900";
 
   return (
     <motion.nav
@@ -466,6 +506,40 @@ const Option = ({ Icon, title, path, selected, setSelected, open, notifs }) => {
   );
 };
 
+const wrapperVariants = {
+  open: {
+    scaleY: 1,
+    transition: {
+      when: "beforeChildren",
+      staggerChildren: 0.1,
+    },
+  },
+  closed: {
+    scaleY: 0,
+    transition: {
+      when: "afterChildren",
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  open: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      when: "beforeChildren",
+    },
+  },
+  closed: {
+    opacity: 0,
+    y: -15,
+    transition: {
+      when: "afterChildren",
+    },
+  },
+};
+
 const TitleSection = ({ open }) => {
   const { resolvedTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -522,26 +596,37 @@ const TitleSection = ({ open }) => {
       </div>
 
       {/* Dropdown Menu */}
-      {open && isDropdownOpen && (
+      {open && (
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.2 }}
-          className={`absolute left-0 mt-2 w-52 mx-2 rounded-lg ${
+          initial="closed"
+          animate={isDropdownOpen ? "open" : "closed"}
+          variants={wrapperVariants}
+          style={{ originY: "top", translateX: "-50%" }}
+          className={`absolute left-[50%] mt-2 w-[200px] rounded-lg ${
             resolvedTheme === "dark" ? "bg-zinc-700" : "bg-indigo-100 shadow-md"
           } shadow-lg py-1 z-50`}
         >
-          {branches.map((branch) => (
+          {branches.map((branch, index) => (
             <motion.div
               key={branch.id}
-              className={`px-4 py-4 my-2 mx-2.5 text-left text-sm cursor-pointer rounded-md ${
+              variants={itemVariants}
+              className={`px-4 py-4 mx-2.5 text-left text-sm cursor-pointer rounded-md ${
                 resolvedTheme === "dark"
                   ? "text-white hover:bg-indigo-400"
                   : "text-base hover:bg-indigo-400"
+              } ${
+                index !== branches.length - 1 // Tambahkan border bottom kecuali untuk item terakhir
+                  ? resolvedTheme === "dark"
+                    ? "border-b border-zinc-600"
+                    : "border-b border-indigo-200"
+                  : ""
               }`}
+              onClick={() => setIsDropdownOpen(false)}
             >
-              {branch.name}
+              <div className="flex items-center gap-2">
+                <BsShop className="text-lg" /> {/* Ikon untuk cabang */}
+                <span>{branch.name}</span> {/* Nama cabang */}
+              </div>
             </motion.div>
           ))}
         </motion.div>
