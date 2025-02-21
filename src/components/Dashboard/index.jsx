@@ -11,7 +11,7 @@ import {
   Phone,
   ArrowRightFromLine,
 } from "lucide-react";
-import { DefaultLayout } from "../Layout";
+import { DefaultLayout } from "../DefaultLayout";
 
 const Dashboard = () => {
   const { theme, setTheme } = useTheme();
@@ -44,7 +44,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <DefaultLayout />
+      <div>Dashboard</div>
     </div>
   );
 };
