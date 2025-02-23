@@ -150,7 +150,7 @@ const Header = () => {
   return (
     <motion.header
       layout
-      className={`h-16 flex items-center justify-between px-6 sticky top-0 z-10 ${
+      className={`h-16 flex items-center justify-between px-6 sticky top-0 z-10 overflow-x-hidden ${
         scrolled
           ? "bg-transparent backdrop-blur-sm shadow-md"
           : "bg-white dark:bg-zinc-900 "
@@ -521,6 +521,7 @@ const TitleSection = ({ open }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedApotek, setSelectedApotek] = useState(null);
   const [selectedCabang, setSelectedCabang] = useState(null);
+  const [selectedApotekName, setSelectedApotekName] = useState(null);
   const [mounted, setMounted] = useState(false);
   let { data: session } = useSession();
 
@@ -530,10 +531,15 @@ const TitleSection = ({ open }) => {
     if (session?.user?.id) {
       const savedApotek = sessionStorage.getItem("selectedApotek");
       const savedCabang = sessionStorage.getItem("selectedCabang");
+      const savedApotekName = sessionStorage.getItem("selectedApotekName");
 
       if (savedApotek) {
         setSelectedApotek(savedApotek);
         fetchCabang(savedApotek);
+      }
+
+      if (savedApotekName) {
+        setSelectedApotekName(savedApotekName);
       }
 
       if (savedCabang) {
@@ -545,9 +551,11 @@ const TitleSection = ({ open }) => {
   useEffect(() => {
     if (selectedApotek) {
       sessionStorage.setItem("selectedApotek", selectedApotek);
+      sessionStorage.setItem("selectedApotekName", selectedApotekName);
     } else {
       sessionStorage.removeItem("selectedApotek");
     }
+    console.log("Nama Apotek:", selectedApotek);
   }, [selectedApotek]);
 
   useEffect(() => {
@@ -644,20 +652,23 @@ const TitleSection = ({ open }) => {
           <div className="flex-shrink-0">
             <Logo />
           </div>
-          <motion.div
-            layout
-            transition={{ delay: 0.125 }}
-            className="overflow-hidden"
-          >
-            <span className="block text-sm font-medium">
-              {cabangData[selectedCabang]?.nama == undefined
-                ? "Pilih Apotek"
-                : selectedCabang
-                ? cabangData[selectedCabang]?.nama
-                : "Pilih Apotek"}
+          <motion.div className="overflow-hidden">
+            {/* Nama Apotek (Selalu di baris pertama dan font lebih tebal) */}
+            <span className="block text-sm font-semibold">
+              {selectedApotekName || "Pilih Apotek"}
             </span>
+
+            {/* Nama Cabang (Di baris kedua dengan font biasa) */}
+            {cabangData[selectedCabang]?.nama ? (
+              <span className="block text-xs font-normal">
+                {cabangData[selectedCabang]?.nama}
+              </span>
+            ) : (
+              <span className="block text-xs font-normal">-</span>
+            )}
           </motion.div>
         </div>
+
         <motion.div
           animate={{ rotate: isDropdownOpen ? 45 : 0 }}
           transition={{ duration: 0.2 }}
@@ -687,8 +698,13 @@ const TitleSection = ({ open }) => {
                   if (selectedApotek === apotekKey) {
                     setSelectedApotek(null); // Collapse if already expanded
                   } else {
-                    setSelectedApotek(apotekKey); // Expand new apotek
-                    fetchCabang(apotekKey); // Fetch branches for new apotek
+                    setSelectedApotek(apotekKey);
+
+                    fetchCabang(apotekKey);
+                    setSelectedApotekName(
+                      apotekData[Object.keys(apotekData)[apotekKey - 1]].nama
+                    );
+                    // Fetch branches for new apotek
                   }
                 }}
               >
