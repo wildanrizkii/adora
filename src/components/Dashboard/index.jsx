@@ -3,12 +3,17 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FiArrowRight, FiMail, FiMapPin } from "react-icons/fi";
 import { SiGithub, SiTiktok, SiYoutube } from "react-icons/si";
+import { useSession } from "next-auth/react";
 
 const Dashboard = () => {
   const itemVariants = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
   };
+
+  let { data: session } = useSession();
+
+  console.log(session);
   return (
     <div className="h-screen rounded-md bg-zinc-100 dark:bg-zinc-600">
       <motion.div
@@ -17,7 +22,7 @@ const Dashboard = () => {
         transition={{
           staggerChildren: 0.05,
         }}
-        className="mx-auto grid max-w-5xl grid-flow-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+        className="mx-auto grid grid-flow-dense grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
       >
         {/* Item 1 */}
         <motion.div

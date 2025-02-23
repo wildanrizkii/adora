@@ -40,19 +40,6 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import "@ant-design/v5-patch-for-react-19";
-import { unstableSetRender } from "antd";
-import { createRoot } from "react-dom/client";
-
-unstableSetRender((node, container) => {
-  container._reactRoot ||= createRoot(container);
-  const root = container._reactRoot;
-  root.render(node);
-  return async () => {
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    root.unmount();
-  };
-});
 
 const ItemList = () => {
   const [open, setOpen] = useState(false);
@@ -466,8 +453,8 @@ const ItemList = () => {
               </Row>
             </Form>
           </Drawer>
-          <div className="grid gap-4">
-            <div className="grid gap-4">
+          <div>
+            <div className="space-y-4">
               <button
                 onClick={showDrawer}
                 type="submit"
@@ -494,7 +481,7 @@ const ItemList = () => {
               columns={columns}
               dataSource={filteredData}
               pagination={{
-                position: ["bottomRight"],
+                position: ["bottomCenter"],
                 responsive: true,
               }}
               size="large"

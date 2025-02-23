@@ -19,14 +19,14 @@ const ProductPage = () => {
 
   return (
     mounted && (
-      <div className="w-full  mx-auto">
+      <div className="w-full max-w-screen-lg mx-auto px-4 sm:px-6">
         {/* Tabs Header */}
-        <div className="relative flex justify-center space-x-4 border-b border-gray-300">
+        <div className="relative flex justify-center overflow-x-auto overflow-y-hidden border-b border-gray-300">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative pb-3 px-6 text-lg font-semibold transition-all ${
+              className={`relative pb-3 px-4 text-sm md:text-lg font-semibold transition-all ${
                 activeTab === tab.id
                   ? "text-blue-500 hover:text-blue-600 dark:text-blue-400"
                   : "text-black hover:text-blue-500 dark:text-white hover:dark:text-blue-400"
@@ -36,8 +36,8 @@ const ProductPage = () => {
               {activeTab === tab.id && (
                 <motion.div
                   layoutId="underline"
-                  className="absolute -bottom-[2px] left-0 right-0 h-[3px] rounded-full bg-blue-400"
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  className="absolute -bottom-[2px] left-0 right-0 h-[5px] rounded-full bg-blue-400"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
             </button>
@@ -45,7 +45,7 @@ const ProductPage = () => {
         </div>
 
         {/* Tabs Content */}
-        <div className="mt-6 p-4 rounded-lg border border-gray-200 shadow-sm">
+        <div className="mt-6 p-4 rounded-lg border border-gray-200 shadow-sm overflow-x-auto">
           {tabs.map((tab) => (
             <motion.div
               key={tab.id}
@@ -55,10 +55,7 @@ const ProductPage = () => {
               transition={{ duration: 0.3 }}
               className={activeTab === tab.id ? "block" : "hidden"}
             >
-              {/* <h3 className="text-xl font-semibold mb-2 text-blue-600">
-                {tab.label}
-              </h3> */}
-              <div className="text-gray-700">{tab.content}</div>
+              <div className="text-gray-700 min-w-max">{tab.content}</div>
             </motion.div>
           ))}
         </div>

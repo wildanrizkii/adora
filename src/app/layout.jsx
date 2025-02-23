@@ -2,6 +2,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { ConfigProvider } from "antd";
+import SessionWrapper from "@/components/SessionWrapper";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -31,12 +32,14 @@ const theme = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <body className={`${plusJakartaSans.variable} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light">
-          <ConfigProvider theme={theme}>{children}</ConfigProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <SessionWrapper>
+      <html lang="en" suppressHydrationWarning={true}>
+        <body className={`${plusJakartaSans.variable} antialiased`}>
+          <ThemeProvider attribute="class" defaultTheme="light">
+            <ConfigProvider theme={theme}>{children}</ConfigProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    </SessionWrapper>
   );
 }

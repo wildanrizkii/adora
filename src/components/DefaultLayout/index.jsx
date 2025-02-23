@@ -22,30 +22,26 @@ import {
   FiShare,
   FiPlusSquare,
 } from "react-icons/fi";
-import { unstableSetRender, Avatar, Space, Dropdown, Badge, Tabs } from "antd";
-import { createRoot } from "react-dom/client";
+import { Avatar, Space, Dropdown, Badge, Tabs } from "antd";
 import { AiOutlineProduct, AiOutlineLogout } from "react-icons/ai";
 import { FaRegFileAlt, FaCloud } from "react-icons/fa";
 import { WiStars } from "react-icons/wi";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
-import { HiMiniChevronUpDown } from "react-icons/hi2";
+import {
+  HiMiniChevronUpDown,
+  HiChevronRight,
+  HiMiniChevronRight,
+} from "react-icons/hi2";
 import { BsShop } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
+import { useSession } from "next-auth/react";
 import { Moon, Sun } from "lucide-react";
+import { signOut } from "next-auth/react";
+import supabase from "@/app/utils/db";
 
 dayjs.locale("id");
-
-unstableSetRender((node, container) => {
-  container._reactRoot ||= createRoot(container);
-  const root = container._reactRoot;
-  root.render(node);
-  return async () => {
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    root.unmount();
-  };
-});
 
 const DefaultLayout = ({ title, content }) => {
   const [mounted, setMounted] = useState(false);
@@ -63,7 +59,7 @@ const DefaultLayout = ({ title, content }) => {
 
   return (
     mounted && (
-      <div className="flex min-h-screen">
+      <div className="relative min-h-screen">
         {/* Create a wrapper div for sidebar that preserves space */}
         <div
           className="shrink-0 transition-all duration-300"
@@ -80,9 +76,9 @@ const DefaultLayout = ({ title, content }) => {
         <motion.div
           layout
           className="flex-1 flex flex-col min-h-screen"
-          animate={{
-            marginLeft: 0,
-            transition: { duration: 0.3, ease: "easeInOut" },
+          style={{
+            marginLeft: open ? "225px" : "64px", // Sesuaikan dengan lebar Sidebar
+            transition: "margin-left 0.3s ease-in-out", // Animasi margin-left
           }}
         >
           <Header title={title} />
@@ -106,6 +102,7 @@ const Header = () => {
   const [isHovering, setIsHovering] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { resolvedTheme } = useTheme();
+  let { data: session } = useSession();
 
   useEffect(() => {
     const handleResize = () => {
@@ -283,9 +280,11 @@ const Header = () => {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <h1 className="font-semibold dark:text-white">
-                          John Doe
+                          {session?.user?.name}
                         </h1>
-                        <h1 className="font-normal dark:text-white">Admin</h1>
+                        <h1 className="font-normal dark:text-white">
+                          {session?.user?.role}
+                        </h1>
                       </div>
 
                       <div className="flex space-x-2">
@@ -299,7 +298,10 @@ const Header = () => {
                         </Link>
                         <div
                           className="flex shadow-md w-14 justify-center items-center p-4 gap-1 text-white text-lg bg-red-500 hover:bg-red-600 rounded-md cursor-pointer transition-colors"
-                          onClick={() => signOut()}
+                          onClick={() => {
+                            signOut();
+                            // clearSessionSelections(); //Jika setelah Logout perlu pilih ulang cabang
+                          }}
                         >
                           <FiLogOut />
                         </div>
@@ -333,6 +335,12 @@ const Header = () => {
       </div>
     </motion.header>
   );
+};
+
+// Untuk pilih ulang cabang saat login
+const clearSessionSelections = () => {
+  sessionStorage.removeItem("selectedApotek");
+  sessionStorage.removeItem("selectedCabang");
 };
 
 const Footer = () => {
@@ -506,128 +514,246 @@ const Option = ({ Icon, title, path, selected, setSelected, open, notifs }) => {
   );
 };
 
-const wrapperVariants = {
-  open: {
-    scaleY: 1,
-    transition: {
-      when: "beforeChildren",
-      staggerChildren: 0.1,
-    },
-  },
-  closed: {
-    scaleY: 0,
-    transition: {
-      when: "afterChildren",
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  open: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      when: "beforeChildren",
-    },
-  },
-  closed: {
-    opacity: 0,
-    y: -15,
-    transition: {
-      when: "afterChildren",
-    },
-  },
-};
-
 const TitleSection = ({ open }) => {
   const { resolvedTheme } = useTheme();
+  const [apotekData, setApotekData] = useState({});
+  const [cabangData, setCabangData] = useState({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [selectedApotek, setSelectedApotek] = useState(null);
+  const [selectedCabang, setSelectedCabang] = useState(null);
   const [mounted, setMounted] = useState(false);
+  let { data: session } = useSession();
 
   useEffect(() => {
     setMounted(true);
-  }, []);
 
-  const hoverClass = mounted
-    ? resolvedTheme === "dark"
-      ? "hover:bg-indigo-100 hover:text-black"
-      : "hover:bg-indigo-100"
-    : "hover:bg-indigo-100";
+    if (session?.user?.id) {
+      const savedApotek = sessionStorage.getItem("selectedApotek");
+      const savedCabang = sessionStorage.getItem("selectedCabang");
 
-  const branches = [
-    { id: 1, name: "Adora Cigadung" },
-    { id: 2, name: "Adora Cikutra" },
-  ];
+      if (savedApotek) {
+        setSelectedApotek(savedApotek);
+        fetchCabang(savedApotek);
+      }
+
+      if (savedCabang) {
+        setSelectedCabang(savedCabang);
+      }
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (selectedApotek) {
+      sessionStorage.setItem("selectedApotek", selectedApotek);
+    } else {
+      sessionStorage.removeItem("selectedApotek");
+    }
+  }, [selectedApotek]);
+
+  useEffect(() => {
+    if (selectedCabang) {
+      sessionStorage.setItem("selectedCabang", selectedCabang);
+    } else {
+      sessionStorage.removeItem("selectedCabang");
+    }
+  }, [selectedCabang]);
+
+  const handleSelectApotek = (id_apotek) => {
+    if (selectedApotek === id_apotek) {
+      setSelectedApotek(null);
+    } else {
+      setSelectedApotek(id_apotek);
+      fetchCabang(id_apotek);
+    }
+  };
+
+  const handleSelectCabang = (id_cabang) => {
+    setSelectedCabang(id_cabang);
+    setIsDropdownOpen(false);
+  };
+
+  const fetchApotek = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("apotek")
+        .select("*")
+        .eq("id_user", session?.user?.id);
+
+      if (error) throw error;
+
+      const apotekObject = data.reduce((acc, row) => {
+        acc[row.id_apotek] = { nama: row.nama_apotek };
+        return acc;
+      }, {});
+
+      setApotekData(apotekObject);
+      console.log(apotekObject); // Debugging
+    } catch (error) {
+      console.error("Error while fetching data Apotek: ", error.message);
+    }
+  };
+
+  const fetchCabang = async (id_apotek) => {
+    try {
+      const { data, error } = await supabase
+        .from("cabang")
+        .select("*")
+        .eq("id_apotek", id_apotek);
+
+      if (error) throw error;
+
+      const cabangObject = data.reduce((acc, row) => {
+        acc[row.id_cabang] = {
+          nama: row.nama_cabang,
+          // Simpan data tambahan cabang jika diperlukan
+        };
+        return acc;
+      }, {});
+
+      setCabangData(cabangObject);
+    } catch (error) {
+      console.error("Error while fetching data Cabang Apotek: ", error);
+      // Tambahkan handling error yang sesuai
+    }
+  };
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      fetchApotek();
+    }
+  }, [session]);
+
+  if (!open) {
+    return (
+      <div className="mb-3 border-b border-slate-300 pb-2">
+        <div className="flex items-center justify-center pt-2">
+          <Logo />
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="mb-3 border-b border-slate-300 pb-3">
+    <div className="relative mb-3 border-b border-slate-300">
+      {/* Main Dropdown Trigger */}
       <div
-        className={`flex cursor-pointer items-center justify-between rounded-md transition-colors ${hoverClass}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsDropdownOpen(!isDropdownOpen);
-        }}
+        className="flex cursor-pointer items-center justify-between rounded-lg transition-all duration-200 p-2.5 mx-1"
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
-        <div className="flex items-center gap-2">
-          <Logo />
-          {open && (
-            <motion.div
-              layout
-              initial={{ opacity: 1, y: 0 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.125 }}
-            >
-              <span className="block text-sm font-semibold">Adora</span>
-              <span className="block text-xs">Cigadung</span>
-            </motion.div>
-          )}
-        </div>
-        {open && (
-          <motion.div className="mr-2">
-            <HiMiniChevronUpDown
-              size={20}
-              className={`transform transition-transform duration-200 ${
-                isDropdownOpen ? "rotate-45" : ""
-              }`}
-            />
+        <div className="flex items-center gap-3">
+          <div className="flex-shrink-0">
+            <Logo />
+          </div>
+          <motion.div
+            layout
+            transition={{ delay: 0.125 }}
+            className="overflow-hidden"
+          >
+            <span className="block text-sm font-medium">
+              {cabangData[selectedCabang]?.nama == undefined
+                ? "Pilih Apotek"
+                : selectedCabang
+                ? cabangData[selectedCabang]?.nama
+                : "Pilih Apotek"}
+            </span>
           </motion.div>
-        )}
+        </div>
+        <motion.div
+          animate={{ rotate: isDropdownOpen ? 45 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="text-gray-500"
+        >
+          <HiMiniChevronUpDown size={20} />
+        </motion.div>
       </div>
 
-      {/* Dropdown Menu */}
-      {open && (
+      {/* Enhanced Dropdown Menu */}
+      {isDropdownOpen && (
         <motion.div
-          initial="closed"
-          animate={isDropdownOpen ? "open" : "closed"}
-          variants={wrapperVariants}
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.15 }}
+          className="absolute left-[50%] mt-1 w-[202px] rounded-xl bg-white dark:bg-zinc-500 shadow-lg py-2 z-50 border border-gray-100"
           style={{ originY: "top", translateX: "-50%" }}
-          className={`absolute left-[50%] mt-2 w-[200px] rounded-lg ${
-            resolvedTheme === "dark" ? "bg-zinc-700" : "bg-indigo-100 shadow-md"
-          } shadow-lg py-1 z-50`}
         >
-          {branches.map((branch, index) => (
-            <motion.div
-              key={branch.id}
-              variants={itemVariants}
-              className={`px-4 py-4 mx-2.5 text-left text-sm cursor-pointer rounded-md ${
-                resolvedTheme === "dark"
-                  ? "text-white hover:bg-indigo-400"
-                  : "text-base hover:bg-indigo-400"
-              } ${
-                index !== branches.length - 1 // Tambahkan border bottom kecuali untuk item terakhir
-                  ? resolvedTheme === "dark"
-                    ? "border-b border-zinc-600"
-                    : "border-b border-indigo-200"
-                  : ""
-              }`}
-              onClick={() => setIsDropdownOpen(false)}
-            >
-              <div className="flex items-center gap-2">
-                <BsShop className="text-lg" /> {/* Ikon untuk cabang */}
-                <span>{branch.name}</span> {/* Nama cabang */}
+          {/* Apotek List */}
+          {Object.keys(apotekData).map((apotekKey) => (
+            <div key={apotekKey} className="relative group">
+              {/* Apotek Item - Now only handles expand/collapse */}
+              <div
+                className="px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-400 group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (selectedApotek === apotekKey) {
+                    setSelectedApotek(null); // Collapse if already expanded
+                  } else {
+                    setSelectedApotek(apotekKey); // Expand new apotek
+                    fetchCabang(apotekKey); // Fetch branches for new apotek
+                  }
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0">
+                      <Logo />
+                    </div>
+                    <span className="font-medium">
+                      {apotekData[apotekKey]?.nama}
+                    </span>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: selectedApotek === apotekKey ? 45 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <HiMiniChevronUpDown size={16} />
+                  </motion.div>
+                </div>
               </div>
-            </motion.div>
+
+              {/* Animated Cabang Submenu */}
+              <motion.div
+                initial={false}
+                animate={{
+                  height: selectedApotek === apotekKey ? "auto" : 0,
+                  opacity: selectedApotek === apotekKey ? 1 : 0,
+                }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
+              >
+                <div className="pl-4 mt-1">
+                  {Object.keys(cabangData).length > 0 ? (
+                    Object.keys(cabangData).map((cabangKey) => (
+                      <div
+                        key={cabangKey}
+                        className={`px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-indigo-200 dark:hover:bg-indigo-300
+                      ${
+                        selectedCabang === cabangKey
+                          ? "bg-indigo-300 dark:bg-indigo-400"
+                          : ""
+                      }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSelectCabang(cabangKey);
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0">
+                            <BsShop className="text-lg" />
+                          </div>
+                          <span className="font-medium">
+                            {cabangData[cabangKey]?.nama}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="px-4 py-3 text-center text-sm italic">
+                      Tidak ada cabang tersedia
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </div>
           ))}
         </motion.div>
       )}
@@ -671,8 +797,8 @@ const ToggleClose = ({ open, setOpen }) => {
 
 const Content = ({ content }) => {
   return (
-    <div className="p-6">
-      <div>{content}</div>
+    <div className="p-6 w-full overflow-x-auto">
+      <div className="min-w-full">{content}</div>
     </div>
   );
 };
