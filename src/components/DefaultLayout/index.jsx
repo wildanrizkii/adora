@@ -525,47 +525,6 @@ const TitleSection = ({ open }) => {
   const [mounted, setMounted] = useState(false);
   let { data: session } = useSession();
 
-  useEffect(() => {
-    setMounted(true);
-
-    if (session?.user?.id) {
-      const savedApotek = sessionStorage.getItem("selectedApotek");
-      const savedCabang = sessionStorage.getItem("selectedCabang");
-      const savedApotekName = sessionStorage.getItem("selectedApotekName");
-
-      if (savedApotek) {
-        setSelectedApotek(savedApotek);
-        fetchCabang(savedApotek);
-      }
-
-      if (savedApotekName) {
-        setSelectedApotekName(savedApotekName);
-      }
-
-      if (savedCabang) {
-        setSelectedCabang(savedCabang);
-      }
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (selectedApotek) {
-      sessionStorage.setItem("selectedApotek", selectedApotek);
-      sessionStorage.setItem("selectedApotekName", selectedApotekName);
-    } else {
-      sessionStorage.removeItem("selectedApotek");
-    }
-    console.log("Nama Apotek:", selectedApotek);
-  }, [selectedApotek]);
-
-  useEffect(() => {
-    if (selectedCabang) {
-      sessionStorage.setItem("selectedCabang", selectedCabang);
-    } else {
-      sessionStorage.removeItem("selectedCabang");
-    }
-  }, [selectedCabang]);
-
   const handleSelectApotek = (id_apotek) => {
     if (selectedApotek === id_apotek) {
       setSelectedApotek(null);
@@ -631,149 +590,196 @@ const TitleSection = ({ open }) => {
     }
   }, [session]);
 
+  useEffect(() => {
+    setMounted(true);
+
+    if (typeof window !== "undefined") {
+      const savedApotek = sessionStorage.getItem("selectedApotek");
+      const savedCabang = sessionStorage.getItem("selectedCabang");
+      const savedApotekName = sessionStorage.getItem("selectedApotekName");
+
+      if (savedApotek) {
+        setSelectedApotek(savedApotek);
+        fetchCabang(savedApotek);
+      }
+
+      if (savedApotekName) {
+        setSelectedApotekName(savedApotekName);
+      }
+
+      if (savedCabang) {
+        setSelectedCabang(savedCabang);
+      }
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (selectedApotek) {
+      sessionStorage.setItem("selectedApotek", selectedApotek);
+      sessionStorage.setItem("selectedApotekName", selectedApotekName);
+    } else {
+      sessionStorage.removeItem("selectedApotek");
+    }
+    console.log("Nama Apotek:", selectedApotek);
+  }, [selectedApotek]);
+
+  useEffect(() => {
+    if (selectedCabang) {
+      sessionStorage.setItem("selectedCabang", selectedCabang);
+    } else {
+      sessionStorage.removeItem("selectedCabang");
+    }
+  }, [selectedCabang]);
+
   if (!open) {
     return (
-      <div className="mb-3 border-b border-slate-300 pb-2">
-        <div className="flex items-center justify-center pt-2">
-          <Logo />
+      mounted && (
+        <div className="mb-3 border-b border-slate-300 pb-2">
+          <div className="flex items-center justify-center pt-2">
+            <Logo />
+          </div>
         </div>
-      </div>
+      )
     );
   }
 
   return (
-    <div className="relative mb-3 border-b border-slate-300">
-      {/* Main Dropdown Trigger */}
-      <div
-        className="flex cursor-pointer items-center justify-between rounded-lg transition-all duration-200 p-2.5 mx-1"
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex-shrink-0">
-            <Logo />
-          </div>
-          <motion.div className="overflow-hidden">
-            {/* Nama Apotek (Selalu di baris pertama dan font lebih tebal) */}
-            <span className="block text-sm font-semibold">
-              {selectedApotekName || "Pilih Apotek"}
-            </span>
-
-            {/* Nama Cabang (Di baris kedua dengan font biasa) */}
-            {cabangData[selectedCabang]?.nama ? (
-              <span className="block text-xs font-normal">
-                {cabangData[selectedCabang]?.nama}
+    mounted && (
+      <div className="relative mb-3 border-b border-slate-300">
+        {/* Main Dropdown Trigger */}
+        <div
+          className="flex cursor-pointer items-center justify-between rounded-lg transition-all duration-200 p-2.5 mx-1"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0">
+              <Logo />
+            </div>
+            <motion.div className="overflow-hidden">
+              {/* Nama Apotek (Selalu di baris pertama dan font lebih tebal) */}
+              <span className="block text-sm font-semibold">
+                {selectedApotekName || "Pilih Apotek"}
               </span>
-            ) : (
-              <span className="block text-xs font-normal">-</span>
-            )}
+
+              {/* Nama Cabang (Di baris kedua dengan font biasa) */}
+              {cabangData[selectedCabang]?.nama ? (
+                <span className="block text-xs font-normal">
+                  {cabangData[selectedCabang]?.nama}
+                </span>
+              ) : (
+                <span className="block text-xs font-normal">-</span>
+              )}
+            </motion.div>
+          </div>
+
+          <motion.div
+            animate={{ rotate: isDropdownOpen ? 45 : 0 }}
+            transition={{ duration: 0.2 }}
+            className="text-gray-500"
+          >
+            <HiMiniChevronUpDown size={20} />
           </motion.div>
         </div>
 
-        <motion.div
-          animate={{ rotate: isDropdownOpen ? 45 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="text-gray-500"
-        >
-          <HiMiniChevronUpDown size={20} />
-        </motion.div>
-      </div>
+        {/* Enhanced Dropdown Menu */}
+        {isDropdownOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.15 }}
+            className="absolute left-[50%] mt-1 w-[202px] rounded-xl bg-white dark:bg-zinc-500 shadow-lg py-2 z-50 border border-gray-100"
+            style={{ originY: "top", translateX: "-50%" }}
+          >
+            {/* Apotek List */}
+            {Object.keys(apotekData).map((apotekKey) => (
+              <div key={apotekKey} className="relative group">
+                {/* Apotek Item - Now only handles expand/collapse */}
+                <div
+                  className="px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-400 group"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (selectedApotek === apotekKey) {
+                      setSelectedApotek(null); // Collapse if already expanded
+                    } else {
+                      setSelectedApotek(apotekKey);
 
-      {/* Enhanced Dropdown Menu */}
-      {isDropdownOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.15 }}
-          className="absolute left-[50%] mt-1 w-[202px] rounded-xl bg-white dark:bg-zinc-500 shadow-lg py-2 z-50 border border-gray-100"
-          style={{ originY: "top", translateX: "-50%" }}
-        >
-          {/* Apotek List */}
-          {Object.keys(apotekData).map((apotekKey) => (
-            <div key={apotekKey} className="relative group">
-              {/* Apotek Item - Now only handles expand/collapse */}
-              <div
-                className="px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-400 group"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (selectedApotek === apotekKey) {
-                    setSelectedApotek(null); // Collapse if already expanded
-                  } else {
-                    setSelectedApotek(apotekKey);
-
-                    fetchCabang(apotekKey);
-                    setSelectedApotekName(
-                      apotekData[Object.keys(apotekData)[apotekKey - 1]].nama
-                    );
-                    // Fetch branches for new apotek
-                  }
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0">
-                      <Logo />
+                      fetchCabang(apotekKey);
+                      setSelectedApotekName(
+                        apotekData[Object.keys(apotekData)[apotekKey - 1]].nama
+                      );
+                      // Fetch branches for new apotek
+                    }
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0">
+                        <Logo />
+                      </div>
+                      <span className="font-medium">
+                        {apotekData[apotekKey]?.nama}
+                      </span>
                     </div>
-                    <span className="font-medium">
-                      {apotekData[apotekKey]?.nama}
-                    </span>
+                    <motion.div
+                      animate={{
+                        rotate: selectedApotek === apotekKey ? 45 : 0,
+                      }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <HiMiniChevronUpDown size={16} />
+                    </motion.div>
                   </div>
-                  <motion.div
-                    animate={{ rotate: selectedApotek === apotekKey ? 45 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <HiMiniChevronUpDown size={16} />
-                  </motion.div>
                 </div>
-              </div>
 
-              {/* Animated Cabang Submenu */}
-              <motion.div
-                initial={false}
-                animate={{
-                  height: selectedApotek === apotekKey ? "auto" : 0,
-                  opacity: selectedApotek === apotekKey ? 1 : 0,
-                }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="pl-4 mt-1">
-                  {Object.keys(cabangData).length > 0 ? (
-                    Object.keys(cabangData).map((cabangKey) => (
-                      <div
-                        key={cabangKey}
-                        className={`px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-indigo-200 dark:hover:bg-indigo-300
+                {/* Animated Cabang Submenu */}
+                <motion.div
+                  initial={false}
+                  animate={{
+                    height: selectedApotek === apotekKey ? "auto" : 0,
+                    opacity: selectedApotek === apotekKey ? 1 : 0,
+                  }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="pl-4 mt-1">
+                    {Object.keys(cabangData).length > 0 ? (
+                      Object.keys(cabangData).map((cabangKey) => (
+                        <div
+                          key={cabangKey}
+                          className={`px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-indigo-200 dark:hover:bg-indigo-300
                       ${
                         selectedCabang === cabangKey
                           ? "bg-indigo-300 dark:bg-indigo-400"
                           : ""
                       }`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSelectCabang(cabangKey);
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="flex-shrink-0">
-                            <BsShop className="text-lg" />
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectCabang(cabangKey);
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0">
+                              <BsShop className="text-lg" />
+                            </div>
+                            <span className="font-medium">
+                              {cabangData[cabangKey]?.nama}
+                            </span>
                           </div>
-                          <span className="font-medium">
-                            {cabangData[cabangKey]?.nama}
-                          </span>
                         </div>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-center text-sm italic">
+                        Tidak ada cabang tersedia
                       </div>
-                    ))
-                  ) : (
-                    <div className="px-4 py-3 text-center text-sm italic">
-                      Tidak ada cabang tersedia
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            </div>
-          ))}
-        </motion.div>
-      )}
-    </div>
+                    )}
+                  </div>
+                </motion.div>
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </div>
+    )
   );
 };
 
