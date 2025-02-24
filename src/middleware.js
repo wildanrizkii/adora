@@ -7,26 +7,39 @@ export async function middleware(req) {
   const token = await getToken({ req, secret });
   const { pathname } = req.nextUrl;
 
+  // Jika tidak ada token dan bukan di halaman login, redirect ke login
   if (!token && pathname !== "/login") {
     const loginUrl = new URL("/login", req.url);
     return NextResponse.redirect(loginUrl);
   }
 
+  // Jika ada token, cek role
   if (token) {
     const userRole = token.role;
     const roleAccess = {
       Pemilik: ["/", "/cashier", "/products"],
-      Admin: ["/", "/cashier", "/products"],
+      Admin: ["/", "/accounts"],
       Karyawan: ["/cashier"],
     };
 
     const allowedPaths = roleAccess[userRole] || [];
-    const isAllowed = allowedPaths.some((route) => pathname.startsWith(route));
+    const isAllowed = allowedPaths.includes(pathname); // <- Menggunakan includes
 
-    // Redirect ke /403 jika role tidak sesuai
-    if (!isAllowed && pathname !== "/403" && pathname !== "/login") {
-      const forbiddenUrl = new URL("/403", req.url);
-      return NextResponse.redirect(forbiddenUrl);
+    const existingPaths = [
+      "/",
+      "/cashier",
+      "/products",
+      "/accounts",
+      "/login",
+      "/forbidden",
+    ];
+
+    if (!existingPaths.includes(pathname)) {
+      return NextResponse.rewrite(new URL("/404", req.url));
+    }
+
+    if (!isAllowed && pathname !== "/forbidden" && pathname !== "/login") {
+      return NextResponse.redirect(new URL("/forbidden", req.url));
     }
   }
 

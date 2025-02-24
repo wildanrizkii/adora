@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 
-const HalamanTidakAda = () => {
+const Forbidden = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -14,14 +14,16 @@ const HalamanTidakAda = () => {
     <div className="grid h-screen place-content-center bg-gradient-to-br from-emerald-50 to-emerald-100 px-4">
       <div className="text-center">
         <h1 className="text-[10rem] font-black text-emerald-500 drop-shadow-md mb-6">
-          404
+          403
         </h1>
 
         <h2 className="text-3xl font-extrabold tracking-tight text-slate-800 sm:text-4xl">
           Oops! Sorry.
         </h2>
 
-        <p className="mt-4 text-lg text-slate-600">We can't find that page.</p>
+        <p className="mt-4 text-lg text-slate-600">
+          You don't have access to this page.
+        </p>
 
         <button
           onClick={() => router.push("/")}
@@ -34,4 +36,4 @@ const HalamanTidakAda = () => {
   );
 };
 
-export default HalamanTidakAda;
+export default Forbidden;
