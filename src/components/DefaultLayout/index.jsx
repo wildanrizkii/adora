@@ -540,7 +540,6 @@ const TitleSection = ({ open }) => {
       }, {});
 
       setApotekData(apotekObject);
-      console.log(apotekObject); // Debugging
     } catch (error) {
       console.error("Error while fetching data Apotek: ", error.message);
     }

@@ -11,9 +11,6 @@ const Dashboard = () => {
     animate: { opacity: 1, y: 0 },
   };
 
-  let { data: session } = useSession();
-
-  console.log(session);
   return (
     <div className="h-screen rounded-md bg-zinc-100 dark:bg-zinc-600">
       <motion.div
