@@ -48,6 +48,7 @@ const DefaultLayout = ({ title, content }) => {
   const [selected, setSelected] = useState(title);
   const isDesktop = useMediaQuery({ minWidth: 768 });
   const [open, setOpen] = useState(isDesktop);
+  const { data: session } = useSession();
 
   useEffect(() => {
     setMounted(true);
@@ -70,6 +71,7 @@ const DefaultLayout = ({ title, content }) => {
             setOpen={setOpen}
             selected={selected}
             setSelected={setSelected}
+            role={session?.user?.role}
           />
         </div>
 
@@ -300,7 +302,7 @@ const Header = () => {
                           className="flex shadow-md w-14 justify-center items-center p-4 gap-1 text-white text-lg bg-red-500 hover:bg-red-600 rounded-md cursor-pointer transition-colors"
                           onClick={() => {
                             signOut();
-                            // clearSessionSelections(); //Jika setelah Logout perlu pilih ulang cabang
+                            clearSessionSelections(); //Jika setelah Logout perlu pilih ulang cabang
                           }}
                         >
                           <FiLogOut />
@@ -341,6 +343,7 @@ const Header = () => {
 const clearSessionSelections = () => {
   sessionStorage.removeItem("selectedApotek");
   sessionStorage.removeItem("selectedCabang");
+  sessionStorage.removeItem("selectedApotekName");
 };
 
 const Footer = () => {
@@ -357,46 +360,29 @@ const Footer = () => {
   );
 };
 
-const menuItems = [
-  {
-    title: "Dashboard",
-    icon: LuLayoutDashboard,
-    path: "/",
-  },
-  {
-    title: "Cashier",
-    icon: FiShoppingCart,
-    path: "/cashier",
-  },
-  {
-    title: "Products",
-    icon: AiOutlineProduct,
-    path: "/products",
-    notifications: 3,
-  },
-  {
-    title: "Suppliers",
-    icon: FiBox,
-    path: "/suppliers",
-  },
-  {
-    title: "Transactions",
-    icon: FiTag,
-    path: "/transactions",
-  },
-  {
-    title: "Report",
-    icon: FaRegFileAlt,
-    path: "/report",
-  },
-  {
-    title: "Account",
-    icon: FiUsers,
-    path: "/account",
-  },
-];
+const menuItems = {
+  Pemilik: [
+    { title: "Dashboard", icon: LuLayoutDashboard, path: "/" },
+    { title: "Cashier", icon: FiShoppingCart, path: "/cashier" },
+    {
+      title: "Products",
+      icon: AiOutlineProduct,
+      path: "/products",
+      notifications: 3,
+    },
+    { title: "Suppliers", icon: FiBox, path: "/suppliers" },
+    { title: "Transactions", icon: FiTag, path: "/transactions" },
+    { title: "Report", icon: FaRegFileAlt, path: "/report" },
+    { title: "Account", icon: FiUsers, path: "/account" },
+  ],
+  Admin: [
+    { title: "Dashboard", icon: LuLayoutDashboard, path: "/" },
+    { title: "Account", icon: FiUsers, path: "/account" },
+  ],
+  Karyawan: [{ title: "Cashier", icon: FiShoppingCart, path: "/cashier" }],
+};
 
-const Sidebar = ({ open, setOpen, selected, setSelected }) => {
+const Sidebar = ({ open, setOpen, selected, setSelected, role }) => {
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -410,11 +396,11 @@ const Sidebar = ({ open, setOpen, selected, setSelected }) => {
   }, []);
 
   useEffect(() => {
-    const currentMenu = menuItems.find((item) => item.path === pathname);
+    const currentMenu = menuItems[role]?.find((item) => item.path === pathname);
     if (currentMenu) {
       setSelected(currentMenu.title);
     }
-  }, [pathname, setSelected]);
+  }, [pathname, setSelected, role]);
 
   const sidebarClass = mounted
     ? `fixed top-0 left-0 h-full shrink-0 ${
@@ -434,7 +420,7 @@ const Sidebar = ({ open, setOpen, selected, setSelected }) => {
       <TitleSection open={open} />
 
       <div className="space-y-2">
-        {menuItems.map((item) => (
+        {menuItems[role]?.map((item) => (
           <Option
             key={item.path}
             Icon={item.icon}
@@ -619,8 +605,8 @@ const TitleSection = ({ open }) => {
       sessionStorage.setItem("selectedApotekName", selectedApotekName);
     } else {
       sessionStorage.removeItem("selectedApotek");
+      sessionStorage.removeItem("selectedApotekName");
     }
-    console.log("Nama Apotek:", selectedApotek);
   }, [selectedApotek]);
 
   useEffect(() => {
