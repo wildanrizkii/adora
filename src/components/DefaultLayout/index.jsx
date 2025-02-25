@@ -40,6 +40,7 @@ import { useSession } from "next-auth/react";
 import { Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
 import supabase from "@/app/utils/db";
+import DashboardAdmin from "@/components/Dashboard/Admin";
 
 dayjs.locale("id");
 
@@ -89,7 +90,15 @@ const DefaultLayout = ({ title, content }) => {
             className="flex-1 overflow-x-hidden"
             transition={{ duration: 0.3, ease: "easeInOut" }}
           >
-            <Content content={content} />
+            <Content
+              content={
+                title === "Dashboard" && session?.user?.role === "Admin" ? (
+                  <DashboardAdmin />
+                ) : (
+                  content
+                )
+              }
+            />
           </motion.div>
           <Footer />
         </motion.div>
