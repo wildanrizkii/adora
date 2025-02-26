@@ -342,3 +342,31 @@ input:-webkit-autofill {
   margin-left: 16px;
   /* Sesuaikan jarak opsi paginasi */
 }
+
+/* .dark .custom-drawer .ant-drawer-body {
+  background-color: #252525 !important;
+  color: white !important;
+} */
+
+/* Warna drawer saat dark mode */
+.dark .custom-drawer .ant-drawer-body {
+  background-color: #444444 !important;
+  color: white !important;
+}
+
+/* Warna header drawer */
+.dark .custom-drawer .ant-drawer-header {
+  background-color: #444444 !important;
+  color: white !important;
+}
+
+/* Warna footer drawer */
+.dark .custom-drawer .ant-drawer-footer {
+  background-color: #444444 !important;
+  color: white !important;
+}
+
+/* Warna label Form.Item saat dark mode */
+.dark .custom-drawer .ant-form-item-label>label {
+  color: white !important;
+}

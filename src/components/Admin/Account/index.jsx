@@ -134,14 +134,14 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
       if (error) {
         notification.error({
           message: "Error",
-          description: "Terjadi kesalahan saat menambah material",
+          description: "Terjadi kesalahan saat menambah member",
           placement: "top",
           duration: 3,
         });
       } else {
         notification.success({
           message: "Berhasil",
-          description: "Material baru berhasil ditambahkan",
+          description: "Member baru berhasil ditambahkan",
           placement: "top",
           duration: 5,
         });
@@ -150,7 +150,7 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
       console.error("Error on submit data!");
       notification.error({
         message: "Error",
-        description: "Terjadi kesalahan saat menambah material",
+        description: "Terjadi kesalahan saat menambah member",
         placement: "top",
         duration: 3,
       });
@@ -189,8 +189,8 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
     <div className="">
       <div className="space-y-4 max-w-5xl mx-auto">
         <div>
-          <h2 className="text-lg font-medium text-gray-900">Team members</h2>
-          <p className="text-sm text-gray-500">
+          <h2 className="text-lg font-medium">Team members</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-300">
             Invite or manage your organisation's members.
           </p>
         </div>
@@ -213,6 +213,7 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
                   paddingBottom: 80,
                 },
               }}
+              className="custom-drawer"
               extra={<p className="text-lg font-bold">Add member</p>}
               footer={
                 <div
