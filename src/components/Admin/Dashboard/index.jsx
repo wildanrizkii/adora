@@ -1,37 +1,48 @@
-import React, { useState } from "react";
+"use client";
+import React, { useState, useEffect } from "react";
+import supabase from "@/app/utils/db";
 
-const DashboardAdmin = ({ itemsPerPage = 1 }) => {
+const DashboardAdmin = ({ itemsPerPage = 10 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [initialData, setInitialData] = useState([]);
 
-  const data = [
-    { name: "John Doe", age: 30, city: "New York" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-    { name: "Jane Smith", age: 25, city: "Los Angeles" },
-  ];
+  const fetchAccount = async () => {
+    try {
+      const { data, error } = await supabase.from("users").select("*");
+      const usersData = data.map((row, index) => ({
+        key: row.id,
+        no: index + 1 + ".",
+        name: row.name,
+        username: row.username,
+        email: row.email,
+        role: row.role,
+        provider: row.provider,
+        status: row.status,
+      }));
+      setInitialData(usersData);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
+    }
+  };
 
   const columns = [
+    { title: "No", key: "no" },
     { title: "Name", key: "name" },
-    { title: "Age", key: "age" },
-    { title: "City", key: "city" },
+    { title: "Username", key: "username" },
+    { title: "Email", key: "email" },
+    { title: "Role", key: "role" },
+    { title: "Provider", key: "provider" },
+    { title: "Status", key: "status" },
   ];
 
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  useEffect(() => {
+    fetchAccount();
+  }, []);
+
+  const totalPages = Math.ceil(initialData.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = data.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = initialData.slice(indexOfFirstItem, indexOfLastItem);
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -79,7 +90,7 @@ const DashboardAdmin = ({ itemsPerPage = 1 }) => {
         paginate={paginate}
         indexOfFirstItem={indexOfFirstItem}
         indexOfLastItem={indexOfLastItem}
-        data={data}
+        data={initialData}
       />
     </div>
   );

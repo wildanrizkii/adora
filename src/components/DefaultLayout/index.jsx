@@ -40,7 +40,7 @@ import { useSession } from "next-auth/react";
 import { Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
 import supabase from "@/app/utils/db";
-import DashboardAdmin from "@/components/Dashboard/Admin";
+import DashboardAdmin from "@/components/Admin/Dashboard";
 
 dayjs.locale("id");
 
@@ -370,7 +370,7 @@ const Footer = () => {
 };
 
 const menuItems = {
-  Pemilik: [
+  Owner: [
     { title: "Dashboard", icon: LuLayoutDashboard, path: "/" },
     { title: "Cashier", icon: FiShoppingCart, path: "/cashier" },
     {

@@ -17,8 +17,8 @@ export async function middleware(req) {
   if (token) {
     const userRole = token.role;
     const roleAccess = {
-      Pemilik: ["/", "/cashier", "/products"],
-      Admin: ["/", "/accounts"],
+      Owner: ["/", "/cashier", "/products"],
+      Admin: ["/", "/account"],
       Karyawan: ["/cashier"],
     };
 
@@ -29,7 +29,7 @@ export async function middleware(req) {
       "/",
       "/cashier",
       "/products",
-      "/accounts",
+      "/account",
       "/login",
       "/forbidden",
     ];
