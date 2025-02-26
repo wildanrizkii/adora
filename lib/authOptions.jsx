@@ -15,10 +15,20 @@ export const authOptions = {
         password: {},
       },
       async authorize(credentials) {
+        // const { data, error } = await supabase
+        //   .from("users")
+        //   .select("*")
+        //   .eq("email", credentials?.email);
         const { data, error } = await supabase
           .from("users")
           .select("*")
-          .eq("email", credentials?.email);
+          .or(
+            `email.eq.${credentials?.email},username.eq.${credentials?.email}`
+          ); // Bisa login dengan email atau username
+
+        if (error || !data.length) {
+          return null;
+        }
         const user = data[0];
 
         const passwordCorrect = await bcrypt.compare(

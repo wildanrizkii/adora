@@ -370,3 +370,106 @@ input:-webkit-autofill {
 .dark .custom-drawer .ant-form-item-label>label {
   color: white !important;
 }
+
+.dark .custom-input .ant-input {
+  background-color: #252525 !important;
+  color: white !important;
+  border: 1px solid #444 !important;
+}
+
+.dark .custom-input .ant-input::placeholder {
+  color: #aaaaaa !important;
+}
+
+.dark .custom-input .ant-input:focus {
+  border-color: #00b894 !important;
+  box-shadow: 0 0 5px rgba(0, 184, 148, 0.5) !important;
+}
+
+/* Pastikan ini ada jika Ant Design masih override styling */
+.dark .ant-input {
+  background-color: #252525 !important;
+  color: white !important;
+}
+
+/* Gaya untuk Input Select */
+.dark .custom-select .ant-select-selector {
+  background-color: #252525 !important;
+  color: white !important;
+  border: 1px solid #444 !important;
+}
+
+/* Placeholder */
+.dark .custom-select .ant-select-selection-placeholder {
+  color: #aaaaaa !important;
+}
+
+/* Dropdown List */
+.dark .custom-select .ant-select-dropdown {
+  background-color: #252525 !important;
+  border: 1px solid #444 !important;
+}
+
+/* Item yang dipilih */
+.dark .custom-select .ant-select-item-option-selected {
+  background-color: #00b894 !important;
+  color: white !important;
+}
+
+/* Hover effect */
+.dark .custom-select .ant-select-item-option:hover {
+  background-color: rgba(0, 184, 148, 0.3) !important;
+}
+
+/* Untuk container dropdown */
+.dark .ant-select-dropdown {
+  background-color: #252525 !important;
+  border: 1px solid #444 !important;
+}
+
+/* Untuk teks di dalam dropdown */
+.dark .ant-select-item {
+  color: white !important;
+}
+
+/* Placeholder */
+.dark .ant-select-selection-placeholder {
+  color: #aaaaaa !important;
+}
+
+/* Item yang sedang dipilih */
+.dark .ant-select-item-option-selected {
+  background-color: #666666 !important;
+  color: white !important;
+}
+
+/* Hover effect */
+.dark .ant-select-item-option:hover {
+  background-color: rgba(155, 155, 155, 0.3) !important;
+}
+
+/* Saat Select dalam mode dark */
+.dark .custom-select .ant-select-selector {
+  background-color: #252525 !important;
+  /* Background Select */
+  color: white !important;
+  /* Warna teks */
+  border: 1px solid #444 !important;
+}
+
+/* Saat Select diklik (aktif/fokus) */
+.dark .custom-select.ant-select-focused .ant-select-selector {
+  border-color: #00b894 !important;
+  /* Border saat fokus */
+  box-shadow: 0 0 5px rgba(0, 184, 148, 0.5) !important;
+}
+
+/* Placeholder tetap putih */
+.dark .custom-select .ant-select-selection-placeholder {
+  color: #aaaaaa !important;
+}
+
+/* Item yang dipilih tetap putih */
+.dark .custom-select .ant-select-selection-item {
+  color: white !important;
+}

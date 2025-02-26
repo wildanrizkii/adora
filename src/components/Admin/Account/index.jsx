@@ -268,7 +268,7 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
                           minHeight: 40,
                           maxHeight: 40,
                         }}
-                        className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                        className="custom-input w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                         required
                       />
                     </Form.Item>
@@ -295,7 +295,7 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
                           minHeight: 40,
                           maxHeight: 40,
                         }}
-                        className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                        className="custom-input w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                         required
                       />
                     </Form.Item>
@@ -322,7 +322,7 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
                           minHeight: 40,
                           maxHeight: 40,
                         }}
-                        className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                        className="custom-input w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                         required
                       />
                     </Form.Item>
@@ -349,7 +349,7 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
                           minHeight: 40,
                           maxHeight: 40,
                         }}
-                        className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                        className="custom-input w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                         required
                       />
                     </Form.Item>
@@ -369,7 +369,7 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
                       ]}
                     >
                       <Select
-                        className="w-full"
+                        className="custom-select w-full"
                         placeholder="Select role"
                         style={{ minHeight: 40 }}
                         options={[

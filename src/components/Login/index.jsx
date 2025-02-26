@@ -13,6 +13,8 @@ import {
 } from "@ant-design/icons";
 import supabase from "@/app/utils/db";
 import { redirect } from "next/navigation";
+import { MdOutlineAlternateEmail } from "react-icons/md";
+import { CgLock } from "react-icons/cg";
 
 const ShuffleHero = () => {
   const [mounted, setMounted] = useState(false);
@@ -105,15 +107,15 @@ const ShuffleHero = () => {
               >
                 <Input
                   autoComplete="false"
-                  type="email"
+                  type="text"
                   id="email"
-                  placeholder="Email"
+                  placeholder="Email / Username"
                   style={{ minHeight: 40 }}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                   prefix={
                     <span style={{ fontSize: 18, width: 20, color: "#ababab" }}>
-                      <UserOutlined />
+                      <MdOutlineAlternateEmail />
                     </span>
                   }
                   size="middle"
@@ -140,7 +142,7 @@ const ShuffleHero = () => {
                   className="w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
                   prefix={
                     <span style={{ fontSize: 18, width: 20, color: "#ababab" }}>
-                      <LockOutlined />
+                      <CgLock />
                     </span>
                   }
                   iconRender={(visible) =>
@@ -180,7 +182,7 @@ const ShuffleHero = () => {
                 alt="Google"
                 className="w-4 h-4"
               />
-              <span className="pb-0.5">Log in with Google for Demo</span>
+              <span className="pb-0.5">Log in with Google</span>
             </Button>
             <Footer />
           </div>
