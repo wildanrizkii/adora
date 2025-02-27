@@ -49,7 +49,14 @@ const DefaultLayout = ({ title, content }) => {
   const [selected, setSelected] = useState(title);
   const isDesktop = useMediaQuery({ minWidth: 768 });
   const [open, setOpen] = useState(isDesktop);
-  const { data: session } = useSession();
+  const [isReady, setIsReady] = useState(false);
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status !== "loading") {
+      setIsReady(true);
+    }
+  }, [status]);
 
   useEffect(() => {
     setMounted(true);
@@ -92,7 +99,9 @@ const DefaultLayout = ({ title, content }) => {
           >
             <Content
               content={
-                title === "Dashboard" && session?.user?.role === "Admin" ? (
+                isReady &&
+                title === "Dashboard" &&
+                session?.user?.role === "Admin" ? (
                   <DashboardAdmin />
                 ) : (
                   content
