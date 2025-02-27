@@ -139,8 +139,13 @@ const AdminLogActivity = () => {
         dataSource={logs}
         columns={columns}
         rowKey="id"
-        pagination={{ pageSize: 10 }}
         className="custom-table"
+        pagination={{
+          position: ["bottomLeft"],
+          responsive: true,
+        }}
+        bordered={true}
+        scroll={{ x: "max-content" }}
       />
     </div>
   );

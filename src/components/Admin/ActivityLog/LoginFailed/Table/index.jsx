@@ -77,6 +77,12 @@ const LogAttemptTable = () => {
         dataSource={data}
         rowKey="id"
         className="custom-table"
+        pagination={{
+          position: ["bottomLeft"],
+          responsive: true,
+        }}
+        bordered={true}
+        scroll={{ x: "max-content" }}
       />
     </Spin>
   );
