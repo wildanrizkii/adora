@@ -5,15 +5,23 @@ import dayjs from "dayjs";
 
 const AdminLogActivity = () => {
   const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchLogs = async () => {
-    const { data, error } = await supabase
-      .from("log_activity")
-      .select("*")
-      .order("times", { ascending: false });
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("log_activity")
+        .select("*")
+        .order("times", { ascending: false });
 
-    if (error) console.error("❌ Gagal mengambil log:", error);
-    else setLogs(data);
+      if (error) console.error("❌ Gagal mengambil log: ", error);
+      else setLogs(data);
+    } catch (error) {
+      console.error("Error while fetching data: ", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -146,6 +154,7 @@ const AdminLogActivity = () => {
         }}
         bordered={true}
         scroll={{ x: "max-content" }}
+        loading={loading}
       />
     </div>
   );

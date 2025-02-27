@@ -43,7 +43,7 @@ export const authOptions = {
             idUser: user?.id,
             role: user?.role,
             action: "Login",
-            detail: "Berhasil login ke sistem",
+            detail: "Login successful",
           });
 
           return {

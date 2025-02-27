@@ -5,8 +5,13 @@ import AdminLogActivity from "@/components/Admin/AdminActivityLog";
 import LogAttemptTable from "@/components/Admin/ActivityLog/LoginFailed/Table";
 
 const DashboardAdmin = ({ itemsPerPage = 10 }) => {
+  const [mounted, setMounted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [initialData, setInitialData] = useState([]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchAccount = async () => {
     try {
@@ -49,14 +54,16 @@ const DashboardAdmin = ({ itemsPerPage = 10 }) => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="w-full space-y-4">
-      <div>
-        <AdminLogActivity />
+    mounted && (
+      <div className="w-full space-y-4">
+        <div>
+          <AdminLogActivity />
+        </div>
+        <div>
+          <LogAttemptTable />
+        </div>
       </div>
-      <div>
-        <LogAttemptTable />
-      </div>
-    </div>
+    )
   );
 };
 

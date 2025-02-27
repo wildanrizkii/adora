@@ -6,6 +6,28 @@ import timezone from "dayjs/plugin/timezone";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const getBrowserName = () => {
+  const userAgent = navigator.userAgent;
+
+  if (
+    userAgent.includes("Chrome") &&
+    !userAgent.includes("Edg") &&
+    !userAgent.includes("OPR")
+  ) {
+    return "Google Chrome";
+  } else if (userAgent.includes("Firefox")) {
+    return "Mozilla Firefox";
+  } else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
+    return "Apple Safari";
+  } else if (userAgent.includes("Edg")) {
+    return "Microsoft Edge";
+  } else if (userAgent.includes("OPR") || userAgent.includes("Opera")) {
+    return "Opera";
+  } else {
+    return "Browser Tidak Dikenal";
+  }
+};
+
 const logActivity = async ({ idUser, role, action, detail }) => {
   try {
     // 🔹 Ambil Lokasi Pengguna
@@ -35,14 +57,14 @@ const logActivity = async ({ idUser, role, action, detail }) => {
     ]);
 
     if (error) throw error;
-    console.log("✅ Log aktivitas berhasil disimpan:", {
-      idUser,
-      action,
-      role,
-      detail,
-      ip_address,
-      location,
-    });
+    // console.log("✅ Log aktivitas berhasil disimpan:", {
+    //   idUser,
+    //   action,
+    //   role,
+    //   detail,
+    //   ip_address,
+    //   location,
+    // });
   } catch (logError) {
     console.error("❌ Gagal menyimpan log:", logError);
   }

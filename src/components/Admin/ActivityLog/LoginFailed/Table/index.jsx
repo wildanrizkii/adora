@@ -29,6 +29,49 @@ const LogAttemptTable = () => {
     fetchLogAttempts();
   }, []);
 
+  const clearLogAttempt = async () => {
+    try {
+      const { error } = await supabase
+        .from("log_attempt")
+        .delete()
+        .neq("id", 0);
+
+      if (error) throw error;
+      console.log("✅ All of login attempt has been cleared.");
+      return true;
+    } catch (error) {
+      console.error("❌ Failed to clearing login attempt:", error);
+      return false;
+    }
+  };
+
+  const ClearLogButton = () => {
+    const [loading, setLoading] = useState(false);
+
+    const handleClearLog = async () => {
+      if (!confirm("Are you sure to clear activity logs?")) return;
+
+      setLoading(true);
+      const success = await clearLogAttempt();
+      setLoading(false);
+
+      if (success) {
+        alert("✅ Login Attempt has been cleared!");
+        fetchLogAttempts();
+      }
+    };
+
+    return (
+      <button
+        onClick={handleClearLog}
+        className="px-4 py-2 bg-indigo-500 text-white text-sm rounded-md hover:bg-indigo-600 disabled:bg-gray-400"
+        disabled={loading}
+      >
+        {loading ? "Menghapus..." : "Clear Log"}
+      </button>
+    );
+  };
+
   const columns = [
     // {
     //   title: "No",
@@ -66,11 +109,12 @@ const LogAttemptTable = () => {
   ];
 
   return (
-    <Spin spinning={loading}>
-      <div className="flex justify-between ">
+    <div>
+      <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-medium mb-4 items-center">
           Login Attemp Logs
         </h2>
+        <ClearLogButton />
       </div>
       <Table
         columns={columns}
@@ -83,8 +127,9 @@ const LogAttemptTable = () => {
         }}
         bordered={true}
         scroll={{ x: "max-content" }}
+        loading={loading}
       />
-    </Spin>
+    </div>
   );
 };
 
