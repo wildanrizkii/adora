@@ -1,4 +1,3 @@
-"use client";
 import supabase from "@/app/utils/db";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -8,7 +7,6 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const logFailedLogin = async (email) => {
-  console.log(email);
   const getWIBTime = () => {
     return dayjs().tz("Asia/Jakarta").format("DD MMM YYYY HH:mm");
   };
@@ -17,6 +15,7 @@ const logFailedLogin = async (email) => {
     const res = await fetch("https://ipinfo.io/json");
     const locationData = await res.json();
     const ipAddress = locationData.ip;
+    const location = `${locationData.city}, ${locationData.region}, ${locationData.country}`;
     const userAgent = navigator.userAgent;
 
     await supabase.from("log_attempt").insert([
@@ -24,7 +23,8 @@ const logFailedLogin = async (email) => {
         email,
         ip_address: ipAddress,
         user_agent: userAgent,
-        waktu: getWIBTime(),
+        times: getWIBTime(),
+        locations: location,
       },
     ]);
   } catch (error) {

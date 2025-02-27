@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import supabase from "@/app/utils/db";
+import AdminLogActivity from "@/components/Admin/AdminActivityLog";
+import LogAttemptTable from "@/components/Admin/ActivityLog/LoginFailed/Table";
 
 const DashboardAdmin = ({ itemsPerPage = 10 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -48,50 +50,12 @@ const DashboardAdmin = ({ itemsPerPage = 10 }) => {
 
   return (
     <div className="w-full space-y-4">
-      {/* Table Container with horizontal scroll on small screens */}
-      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-        <table className="w-full text-sm text-left">
-          {/* Table Header */}
-          <thead className="bg-white dark:bg-zinc-500 border-b-2">
-            <tr>
-              {columns.map((column, index) => (
-                <th
-                  key={index}
-                  className="px-4 py-3 font-medium whitespace-nowrap"
-                >
-                  {column.title}
-                </th>
-              ))}
-            </tr>
-          </thead>
-
-          {/* Table Body */}
-          <tbody className="divide-y divide-gray-200">
-            {currentItems.map((item, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className="bg-white dark:bg-zinc-400 dark:hover:bg-zinc-500 hover:bg-zinc-100"
-              >
-                {columns.map((column, colIndex) => (
-                  <td key={colIndex} className="px-4 py-3 text-gray-700">
-                    {item[column.key]}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div>
+        <AdminLogActivity />
       </div>
-
-      {/* Pagination */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        paginate={paginate}
-        indexOfFirstItem={indexOfFirstItem}
-        indexOfLastItem={indexOfLastItem}
-        data={initialData}
-      />
+      <div>
+        <LogAttemptTable />
+      </div>
     </div>
   );
 };

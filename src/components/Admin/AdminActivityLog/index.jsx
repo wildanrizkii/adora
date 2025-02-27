@@ -53,15 +53,14 @@ const AdminLogActivity = () => {
     const [loading, setLoading] = useState(false);
 
     const handleClearLog = async () => {
-      if (!confirm("Apakah Anda yakin ingin menghapus semua log aktivitas?"))
-        return;
+      if (!confirm("Are you sure to clear activity logs?")) return;
 
       setLoading(true);
       const success = await clearLogActivity();
       setLoading(false);
 
       if (success) {
-        alert("✅ Semua log aktivitas telah dihapus!");
+        alert("✅ Activity logs has been cleared!");
         fetchLogs();
       }
     };
@@ -69,7 +68,7 @@ const AdminLogActivity = () => {
     return (
       <button
         onClick={handleClearLog}
-        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-gray-400"
+        className="px-4 py-2 bg-indigo-500 text-white text-sm rounded-md hover:bg-indigo-600 disabled:bg-gray-400"
         disabled={loading}
       >
         {loading ? "Menghapus..." : "Clear Log"}
@@ -131,10 +130,8 @@ const AdminLogActivity = () => {
 
   return (
     <div>
-      <div className="flex justify-between ">
-        <h2 className="text-lg font-semibold mb-4 items-center">
-          📜 User Activity Logs
-        </h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-medium">User Activity Logs</h2>
         <ClearLogButton />
       </div>
 
@@ -143,6 +140,7 @@ const AdminLogActivity = () => {
         columns={columns}
         rowKey="id"
         pagination={{ pageSize: 10 }}
+        className="custom-table"
       />
     </div>
   );

@@ -1,4 +1,3 @@
-"use client";
 import supabase from "@/app/utils/db";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -7,7 +6,7 @@ import timezone from "dayjs/plugin/timezone";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const logLoginActivity = async ({ idUser, role, action, detail }) => {
+const logActivity = async ({ idUser, role, action, detail }) => {
   try {
     // 🔹 Ambil Lokasi Pengguna
     const res = await fetch("https://ipinfo.io/json");
@@ -49,4 +48,4 @@ const logLoginActivity = async ({ idUser, role, action, detail }) => {
   }
 };
 
-export default logLoginActivity;
+export default logActivity;

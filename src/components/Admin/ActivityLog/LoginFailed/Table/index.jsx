@@ -1,6 +1,4 @@
 "use client";
-"use client";
-
 import { useEffect, useState } from "react";
 import { Table, Tag, Spin, message } from "antd";
 import dayjs from "dayjs";
@@ -32,12 +30,12 @@ const LogAttemptTable = () => {
   }, []);
 
   const columns = [
-    {
-      title: "No",
-      dataIndex: "no",
-      key: "no",
-      render: (text, record, index) => index + 1,
-    },
+    // {
+    //   title: "No",
+    //   dataIndex: "no",
+    //   key: "no",
+    //   render: (text, record, index) => index + 1,
+    // },
     {
       title: "Email",
       dataIndex: "email",
@@ -49,27 +47,37 @@ const LogAttemptTable = () => {
       key: "ip_address",
     },
     {
+      title: "Location",
+      dataIndex: "locations",
+      key: "locations",
+    },
+    {
+      title: "Times",
+      dataIndex: "times",
+      key: "times",
+      render: (text) => dayjs(text).format("DD MMM YYYY HH:mm"),
+    },
+    {
       title: "User Agent",
       dataIndex: "user_agent",
       key: "user_agent",
       ellipsis: true,
-    },
-    {
-      title: "Time",
-      dataIndex: "Time",
-      key: "time",
-      render: (text) => dayjs(text).format("DD MMM YYYY HH:mm"),
     },
   ];
 
   return (
     <Spin spinning={loading}>
       <div className="flex justify-between ">
-        <h2 className="text-lg font-semibold mb-4 items-center">
-          📜 Login Attemp Logs
+        <h2 className="text-lg font-medium mb-4 items-center">
+          Login Attemp Logs
         </h2>
       </div>
-      <Table columns={columns} dataSource={data} rowKey="id" />
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey="id"
+        className="custom-table"
+      />
     </Spin>
   );
 };

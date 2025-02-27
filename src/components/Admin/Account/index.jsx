@@ -764,13 +764,6 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
           data={initialData}
         />
       </div>
-
-      <div>
-        <AdminLogActivity />
-      </div>
-      <div>
-        <LogAttemptTable />
-      </div>
     </div>
   );
 };
