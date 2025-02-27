@@ -55,11 +55,7 @@ const DefaultLayout = ({ title, content }) => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      const timer = setTimeout(() => {
-        setIsReady(true);
-      }, 1000); // Delay 1 detik
-
-      return () => clearTimeout(timer);
+      setIsReady(true);
     }
   }, [status]);
 
