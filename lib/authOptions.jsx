@@ -16,7 +16,7 @@ export const authOptions = {
         email: {},
         password: {},
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         // const { data, error } = await supabase
         //   .from("users")
         //   .select("*")
@@ -39,11 +39,13 @@ export const authOptions = {
         );
 
         if (passwordCorrect) {
+          const userAgent = req.headers["user-agent"] || "Unknown";
           await logActivity({
             idUser: user?.id,
             role: user?.role,
             action: "Login",
             detail: "Login successful",
+            userAgent: userAgent,
           });
 
           return {
@@ -56,7 +58,8 @@ export const authOptions = {
             status: user?.status,
           };
         } else {
-          await logFailedLogin(credentials?.email);
+          const userAgent = req.headers["user-agent"] || "Unknown";
+          await logFailedLogin(credentials?.email, userAgent);
         }
 
         // console.log("credentials", credentials);

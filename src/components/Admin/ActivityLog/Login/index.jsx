@@ -6,9 +6,7 @@ import timezone from "dayjs/plugin/timezone";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const getBrowserName = () => {
-  const userAgent = navigator.userAgent;
-
+const getBrowserName = (userAgent) => {
   if (
     userAgent.includes("Chrome") &&
     !userAgent.includes("Edg") &&
@@ -28,7 +26,7 @@ const getBrowserName = () => {
   }
 };
 
-const logActivity = async ({ idUser, role, action, detail }) => {
+const logActivity = async ({ idUser, role, action, detail, userAgent }) => {
   try {
     // 🔹 Ambil Lokasi Pengguna
     const res = await fetch("https://ipinfo.io/json");
@@ -39,9 +37,6 @@ const logActivity = async ({ idUser, role, action, detail }) => {
       return dayjs().tz("Asia/Jakarta").format("DD MMM YYYY HH:mm");
     };
 
-    // 🔹 Ambil User Agent
-    const userAgent = navigator?.userAgent || "Unknown";
-
     // 🔹 Simpan Log ke Database
     const { error } = await supabase.from("log_activity").insert([
       {
@@ -51,7 +46,7 @@ const logActivity = async ({ idUser, role, action, detail }) => {
         detail,
         ip_address,
         location,
-        user_agent: userAgent,
+        user_agent: getBrowserName(userAgent),
         times: getWIBTime(),
       },
     ]);
