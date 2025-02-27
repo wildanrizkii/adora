@@ -105,14 +105,15 @@ const AdminLogActivity = () => {
       ),
     },
     {
-      title: "Detail",
-      dataIndex: "detail",
-      key: "detail",
-    },
-    {
       title: "Location",
       dataIndex: "location",
       key: "location",
+    },
+    {
+      title: "Times",
+      dataIndex: "times",
+      key: "times",
+      render: (text) => dayjs(text).format("DD MMM YYYY HH:mm"),
     },
     {
       title: "User Agent",
@@ -121,10 +122,9 @@ const AdminLogActivity = () => {
       ellipsis: true,
     },
     {
-      title: "Times",
-      dataIndex: "times",
-      key: "times",
-      render: (text) => dayjs(text).format("DD MMM YYYY HH:mm"),
+      title: "Detail",
+      dataIndex: "detail",
+      key: "detail",
     },
   ];
 
