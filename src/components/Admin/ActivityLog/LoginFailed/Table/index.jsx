@@ -19,7 +19,7 @@ const LogAttemptTable = () => {
       if (error) throw error;
       setData(logAttempts);
     } catch (err) {
-      message.error("Gagal mengambil data log percobaan login");
+      message.error("Failed to retrieve login attempt log data");
     } finally {
       setLoading(false);
     }
@@ -109,11 +109,9 @@ const LogAttemptTable = () => {
   ];
 
   return (
-    <div>
+    <div className="space-y-1">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium mb-4 items-center">
-          Login Attemp Logs
-        </h2>
+        <h2 className="text-xl font-medium">Login Attemp Logs</h2>
         <ClearLogButton />
       </div>
       <Table

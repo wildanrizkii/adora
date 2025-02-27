@@ -22,7 +22,7 @@ const getBrowserName = (userAgent) => {
   } else if (userAgent.includes("OPR") || userAgent.includes("Opera")) {
     return "Opera";
   } else {
-    return "Browser Tidak Dikenal";
+    return "Unrecognized Browser";
   }
 };
 
@@ -47,7 +47,7 @@ const logFailedLogin = async (email, userAgent) => {
       },
     ]);
   } catch (error) {
-    console.error("❌ Gagal menyimpan log percobaan login:", error);
+    console.error("❌ Failed to save log:", error);
   }
 };
 

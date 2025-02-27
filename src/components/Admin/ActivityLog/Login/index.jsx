@@ -61,7 +61,7 @@ const logActivity = async ({ idUser, role, action, detail, userAgent }) => {
     //   location,
     // });
   } catch (logError) {
-    console.error("❌ Gagal menyimpan log:", logError);
+    console.error("❌ Failed to save log:", logError);
   }
 };
 

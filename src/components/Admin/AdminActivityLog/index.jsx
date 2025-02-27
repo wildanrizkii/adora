@@ -15,7 +15,7 @@ const AdminLogActivity = () => {
         .select("*")
         .order("times", { ascending: false });
 
-      if (error) console.error("❌ Gagal mengambil log: ", error);
+      if (error) console.error("❌ Failed to fetch log: ", error);
       else setLogs(data);
     } catch (error) {
       console.error("Error while fetching data: ", error);
@@ -49,10 +49,10 @@ const AdminLogActivity = () => {
         .neq("id", 0);
 
       if (error) throw error;
-      console.log("✅ Semua log aktivitas berhasil dihapus.");
+      console.log("✅ All activity logs were successfully deleted..");
       return true;
     } catch (error) {
-      console.error("❌ Gagal menghapus log aktivitas:", error);
+      console.error("❌ Failed to delete activity log:", error);
       return false;
     }
   };
@@ -103,6 +103,7 @@ const AdminLogActivity = () => {
       title: "User ID",
       dataIndex: "id_user",
       key: "id_user",
+      // align: "center",
     },
     {
       title: "Action",
@@ -137,9 +138,9 @@ const AdminLogActivity = () => {
   ];
 
   return (
-    <div>
+    <div className="space-y-1">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-medium">User Activity Logs</h2>
+        <h2 className="text-xl font-medium">User Activity Logs</h2>
         <ClearLogButton />
       </div>
 

@@ -56,7 +56,7 @@ const DashboardAdmin = ({ itemsPerPage = 10 }) => {
 
   return (
     mounted && (
-      <div className="w-full space-y-4">
+      <div className="w-full space-y-12">
         <div>
           <LoginChart />
         </div>
