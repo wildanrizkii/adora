@@ -1,6 +1,8 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import supabase from "@/app/utils/db";
+import logLoginActivity from "@/components/Admin/ActivityLog/Login";
+import logFailedLogin from "@/components/Admin/ActivityLog/LoginFailed";
 
 export const authOptions = {
   session: {
@@ -27,7 +29,8 @@ export const authOptions = {
           ); // Bisa login dengan email atau username
 
         if (error || !data.length) {
-          return null;
+          await logFailedLogin(credentials?.email);
+          return;
         }
         const user = data[0];
 
@@ -37,6 +40,13 @@ export const authOptions = {
         );
 
         if (passwordCorrect) {
+          await logLoginActivity({
+            idUser: user?.id,
+            role: user?.role,
+            action: "Login",
+            detail: "Berhasil login ke sistem",
+          });
+
           return {
             id: user?.id,
             name: user?.name,
@@ -47,6 +57,10 @@ export const authOptions = {
             status: user?.status,
           };
         }
+
+        // if (!passwordCorrect) {
+        //   await logFailedLogin(credentials?.email);
+        // }
 
         // console.log("credentials", credentials);
         return null;

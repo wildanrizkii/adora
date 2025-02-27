@@ -19,6 +19,8 @@ import {
 import { useForm } from "antd/es/form/Form";
 import { useRouter } from "next/navigation";
 import bcrypt from "bcryptjs";
+import AdminLogActivity from "../AdminActivityLog";
+import LogAttemptTable from "../ActivityLog/LoginFailed/Table";
 
 dayjs.extend(localizedFormat);
 dayjs.locale("id");
@@ -29,10 +31,12 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
   const [open, setOpen] = useState(false);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
 
   const router = useRouter();
 
   const [form] = useForm();
+  const [editForm] = useForm();
 
   const formatTanggal = (tanggal) => {
     return dayjs(tanggal).format("D MMMM YYYY");
@@ -108,8 +112,6 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
 
   const handleSubmit = async (values) => {
     try {
-      console.log(values);
-      console.log(getHashPassword(values.password));
       const { data, error } = await supabase.from("users").insert([
         {
           name: values.name,
@@ -159,6 +161,68 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
     }
   };
 
+  const showEditDrawer = (values) => {
+    setEditDrawerOpen(true);
+
+    editForm.setFieldsValue({
+      id: values.id,
+      name: values.name,
+      username: values.username,
+      email: values.email,
+      role: values.role,
+      status: values.status,
+    });
+  };
+
+  const hideEditDrawer = () => {
+    setEditDrawerOpen(false);
+    editForm.resetFields();
+  };
+
+  const handleEdit = async (values) => {
+    try {
+      const updateData = {
+        name: values.name,
+        username: values.username,
+        email: values.email,
+        role: values.role,
+        status: values.status,
+      };
+
+      if (values.password) {
+        updateData.password = getHashPassword(values.password);
+      }
+
+      const { error } = await supabase
+        .from("users")
+        .update(updateData)
+        .eq("id", values.id);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      notification.success({
+        message: "Berhasil",
+        description: "Data member berhasil diperbarui",
+        placement: "top",
+        duration: 5,
+      });
+
+      hideEditDrawer();
+      fetchAccount();
+    } catch (err) {
+      console.error("Error updating user:", err);
+
+      notification.error({
+        message: "Error",
+        description: "Terjadi kesalahan saat memperbarui data member",
+        placement: "top",
+        duration: 3,
+      });
+    }
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case "Active":
@@ -186,7 +250,7 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
   };
 
   return (
-    <div className="">
+    <div className="space-y-8">
       <div className="space-y-4 max-w-5xl mx-auto">
         <div>
           <h2 className="text-lg font-medium">Team members</h2>
@@ -450,10 +514,239 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap text-center">
                       {member.role !== "Admin" && (
-                        <button className="text-red-600 hover:text-red-900 pt-1">
+                        <button
+                          className="text-red-600 hover:text-red-900 pt-1"
+                          onClick={() => {
+                            showEditDrawer(member);
+                          }}
+                        >
                           <FiEdit size={20} />
                         </button>
                       )}
+                      <Drawer
+                        width={720}
+                        onClose={hideEditDrawer}
+                        open={editDrawerOpen}
+                        styles={{
+                          body: {
+                            paddingBottom: 80,
+                          },
+                        }}
+                        className="custom-drawer"
+                        extra={<p className="text-lg font-bold">Add member</p>}
+                        footer={
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "flex-end",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            <Space>
+                              <button
+                                type="button"
+                                onClick={hideEditDrawer}
+                                className="max-w-44 text-wrap rounded border border-emerald-600 bg-white px-4 py-2 text-sm font-medium text-emerald-600 hover:text-white hover:bg-emerald-600 focus:outline-none focus:ring active:text-emerald-500 transition-colors"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                onClick={() => editForm.submit()}
+                                type="button"
+                                className="min-w-36 text-wrap rounded border border-emerald-600 bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-transparent hover:text-emerald-600 focus:outline-none focus:ring active:text-emerald-500 transition-colors"
+                              >
+                                Save
+                              </button>
+                            </Space>
+                          </div>
+                        }
+                      >
+                        <Form
+                          layout="vertical"
+                          onFinish={(values) =>
+                            handleEdit({
+                              ...values,
+                              id: editForm.getFieldValue("id"),
+                            })
+                          }
+                          form={editForm}
+                          initialValues={editForm}
+                        >
+                          <Row gutter={16}>
+                            <Col span={24}>
+                              <Form.Item
+                                name="name"
+                                label="Full Name"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "Enter your full name",
+                                  },
+                                ]}
+                              >
+                                <Input
+                                  type="text"
+                                  id="name"
+                                  placeholder="Enter your full name"
+                                  style={{
+                                    minHeight: 40,
+                                    maxHeight: 40,
+                                  }}
+                                  className="custom-input w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                                  required
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+
+                          <Row gutter={16}>
+                            <Col span={24}>
+                              <Form.Item
+                                name="username"
+                                label="Username"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "Enter your username",
+                                  },
+                                ]}
+                              >
+                                <Input
+                                  type="text"
+                                  id="username"
+                                  placeholder="Enter your username"
+                                  style={{
+                                    minHeight: 40,
+                                    maxHeight: 40,
+                                  }}
+                                  className="custom-input w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                                  required
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+
+                          <Row gutter={16}>
+                            <Col span={24}>
+                              <Form.Item
+                                name="email"
+                                label="Email"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "Enter your email",
+                                  },
+                                ]}
+                              >
+                                <Input
+                                  type="email"
+                                  id="email"
+                                  placeholder="Enter your email"
+                                  style={{
+                                    minHeight: 40,
+                                    maxHeight: 40,
+                                  }}
+                                  className="custom-input w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                                  required
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+
+                          <Row gutter={16}>
+                            <Col span={24}>
+                              <Form.Item
+                                name="password"
+                                label={
+                                  <div className="flex items-center gap-2">
+                                    Replace Password
+                                    <Button
+                                      type={isEditable ? "default" : "primary"}
+                                      size="small"
+                                      onClick={() =>
+                                        setIsEditable((prev) => !prev)
+                                      }
+                                    >
+                                      {isEditable
+                                        ? "Disable Editing"
+                                        : "Confirm Change"}
+                                    </Button>
+                                  </div>
+                                }
+                                rules={[
+                                  {
+                                    required: false,
+                                    message: "Enter your password",
+                                  },
+                                ]}
+                              >
+                                <Input
+                                  type="password"
+                                  id="password"
+                                  placeholder="Enter your password"
+                                  disabled={!isEditable}
+                                  style={{
+                                    minHeight: 40,
+                                    maxHeight: 40,
+                                  }}
+                                  className="custom-input w-full rounded-md border-gray-200 shadow-sm sm:text-sm"
+                                  required
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+
+                          <Row gutter={16}>
+                            <Col span={24}>
+                              <Form.Item
+                                name="role"
+                                label="Role"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "Select role",
+                                  },
+                                ]}
+                              >
+                                <Select
+                                  className="custom-select w-full"
+                                  placeholder="Select role"
+                                  style={{ minHeight: 40 }}
+                                  options={[
+                                    { label: "Admin", value: "Admin" },
+                                    { label: "Owner", value: "Owner" },
+                                  ]}
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+
+                          <Row gutter={16}>
+                            <Col span={24}>
+                              <Form.Item
+                                name="status"
+                                label="Status"
+                                rules={[
+                                  {
+                                    required: true,
+                                    message: "Select status",
+                                  },
+                                ]}
+                              >
+                                <Select
+                                  className="custom-select w-full"
+                                  placeholder="Select status"
+                                  style={{ minHeight: 40 }}
+                                  options={[
+                                    { label: "Active", value: "Active" },
+                                    { label: "Disable", value: "Disable" },
+                                  ]}
+                                />
+                              </Form.Item>
+                            </Col>
+                          </Row>
+                        </Form>
+                      </Drawer>
                     </td>
                   </tr>
                 ))}
@@ -470,6 +763,13 @@ const ManageAccount = ({ itemsPerPage = 10 }) => {
           indexOfLastItem={indexOfLastItem}
           data={initialData}
         />
+      </div>
+
+      <div>
+        <AdminLogActivity />
+      </div>
+      <div>
+        <LogAttemptTable />
       </div>
     </div>
   );

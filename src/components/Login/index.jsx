@@ -35,19 +35,24 @@ const ShuffleHero = () => {
   const handleSubmit = async () => {
     try {
       if (email.length >= 4 && password.length >= 4) {
-        const response = await signIn("credentials", {
-          email: email,
-          password: password,
-          redirect: false,
-        });
-
-        if (response?.error) {
-          notification.error({
-            message: "Error",
-            description: "Email atau password yang Anda masukan salah!",
-            placement: "top",
-            duration: 3,
+        try {
+          const response = await signIn("credentials", {
+            email: email,
+            password: password,
+            redirect: false,
           });
+
+          if (response?.error) {
+            console.clear(); // Bersihkan console agar error tidak terlihat
+            notification.error({
+              message: "Error",
+              description: "Email atau password yang Anda masukkan salah!",
+              placement: "top",
+              duration: 3,
+            });
+          }
+        } catch (err) {
+          console.clear(); // Tangkap dan bersihkan error sebelum muncul di console
         }
       } else {
         notification.error({
@@ -58,7 +63,13 @@ const ShuffleHero = () => {
         });
       }
     } catch (error) {
-      console.error("Error on routes", error);
+      console.clear();
+      notification.error({
+        message: "Error",
+        description: "Terjadi kesalahan saat proses login",
+        placement: "top",
+        duration: 3,
+      });
     }
   };
 
