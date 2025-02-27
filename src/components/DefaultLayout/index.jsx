@@ -812,10 +812,18 @@ const ToggleClose = ({ open, setOpen }) => {
 };
 
 const Content = ({ content }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
-    <div className="p-6 w-full overflow-x-auto">
-      <div className="min-w-full">{content}</div>
-    </div>
+    mounted && (
+      <div className="p-6 w-full overflow-x-auto">
+        <div className="min-w-full">{content}</div>
+      </div>
+    )
   );
 };
 
