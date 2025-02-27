@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import supabase from "@/app/utils/db";
 import AdminLogActivity from "@/components/Admin/AdminActivityLog";
 import LogAttemptTable from "@/components/Admin/ActivityLog/LoginFailed/Table";
+import LoginChart from "../UserLoginChart";
 
 const DashboardAdmin = ({ itemsPerPage = 10 }) => {
   const [mounted, setMounted] = useState(false);
@@ -56,6 +57,9 @@ const DashboardAdmin = ({ itemsPerPage = 10 }) => {
   return (
     mounted && (
       <div className="w-full space-y-4">
+        <div>
+          <LoginChart />
+        </div>
         <div>
           <AdminLogActivity />
         </div>
