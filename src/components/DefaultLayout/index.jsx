@@ -53,8 +53,12 @@ const DefaultLayout = ({ title, content }) => {
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (status !== "loading") {
-      setIsReady(true);
+    if (status === "authenticated") {
+      const timer = setTimeout(() => {
+        setIsReady(true);
+      }, 1000); // Delay 1 detik
+
+      return () => clearTimeout(timer);
     }
   }, [status]);
 
@@ -99,9 +103,8 @@ const DefaultLayout = ({ title, content }) => {
           >
             <Content
               content={
-                isReady &&
-                title === "Dashboard" &&
-                session?.user?.role === "Admin" ? (
+                !isReady ? null : title === "Dashboard" &&
+                  session?.user?.role === "Admin" ? (
                   <DashboardAdmin />
                 ) : (
                   content
