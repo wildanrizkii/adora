@@ -22,7 +22,7 @@ import {
   FiShare,
   FiPlusSquare,
 } from "react-icons/fi";
-import { Avatar, Space, Dropdown, Badge, Tabs } from "antd";
+import { Avatar, Space, Dropdown, Badge, Tabs, Spin } from "antd";
 import { AiOutlineProduct, AiOutlineLogout } from "react-icons/ai";
 import { FaRegFileAlt, FaCloud } from "react-icons/fa";
 import { WiStars } from "react-icons/wi";
@@ -41,6 +41,7 @@ import { Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
 import supabase from "@/app/utils/db";
 import DashboardAdmin from "@/components/Admin/Dashboard";
+import Loading from "@/app/loading";
 
 dayjs.locale("id");
 
