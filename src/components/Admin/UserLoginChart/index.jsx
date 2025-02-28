@@ -247,7 +247,7 @@ const LoginChart = () => {
                 htmlFor="startDate"
                 className="block text-sm font-medium mb-1"
               >
-                Dari Tanggal
+                From date
               </label>
               <input
                 type="date"
@@ -263,7 +263,7 @@ const LoginChart = () => {
                 htmlFor="endDate"
                 className="block text-sm font-medium mb-1"
               >
-                Sampai Tanggal
+                Until date
               </label>
               <input
                 type="date"
@@ -282,19 +282,19 @@ const LoginChart = () => {
               onClick={handleTodayClick}
               className="px-2 py-1 md:px-3 md:py-2 bg-blue-100 text-nowrap text-blue-700 text-sm md:text-sm rounded-md hover:bg-blue-200 transition-colors"
             >
-              Hari Ini
+              Today
             </button>
             <button
               onClick={handleLastWeekClick}
               className="px-2 py-1 md:px-3 md:py-2 bg-blue-100 text-nowrap text-blue-700 text-sm md:text-sm rounded-md hover:bg-blue-200 transition-colors"
             >
-              7 Hari Terakhir
+              Last 7 Days
             </button>
             <button
               onClick={handleLastMonthClick}
               className="px-2 py-1 md:px-3 md:py-2 bg-blue-100 text-nowrap text-blue-700 text-sm md:text-sm rounded-md hover:bg-blue-200 transition-colors"
             >
-              30 Hari Terakhir
+              Last 30 Days
             </button>
           </div>
         </div>

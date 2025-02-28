@@ -41,7 +41,6 @@ import { Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
 import supabase from "@/app/utils/db";
 import DashboardAdmin from "@/components/Admin/Dashboard";
-import Loading from "@/app/loading";
 
 dayjs.locale("id");
 
