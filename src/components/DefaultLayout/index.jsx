@@ -73,7 +73,6 @@ const DefaultLayout = ({ title, content }) => {
   return (
     mounted && (
       <div className="relative min-h-screen">
-        {/* Create a wrapper div for sidebar that preserves space */}
         <div
           className="shrink-0 transition-all duration-300"
           style={{ width: open ? "225px" : "64px" }}
@@ -132,7 +131,7 @@ const Header = () => {
       setShowTheme(window.innerWidth >= 356);
     };
 
-    handleResize(); // Jalankan saat komponen pertama kali dimuat
+    handleResize();
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
