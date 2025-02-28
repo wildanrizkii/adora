@@ -21,12 +21,12 @@ const ProductPage = () => {
     mounted && (
       <div className="w-full max-w-screen-lg mx-auto px-4 sm:px-6">
         {/* Tabs Header */}
-        <div className="relative flex justify-center overflow-x-auto overflow-y-hidden border-b border-gray-300">
+        <div className="relative flex justify-start overflow-x-auto overflow-y-hidden border-b border-gray-300">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative pb-3 px-4 text-sm md:text-lg font-semibold transition-all ${
+              className={`relative pb-3 px-4 text-sm md:text-lg font-normal transition-all ${
                 activeTab === tab.id
                   ? "text-blue-500 hover:text-blue-600 dark:text-blue-400"
                   : "text-black hover:text-blue-500 dark:text-white hover:dark:text-blue-400"

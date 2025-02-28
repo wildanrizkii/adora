@@ -331,6 +331,7 @@ const ItemList = () => {
                 paddingBottom: 80,
               },
             }}
+            className="custom-drawer"
             extra={<p className="text-lg font-bold">Tambah Material</p>}
             footer={
               <div
@@ -397,6 +398,7 @@ const ItemList = () => {
                 paddingBottom: 80,
               },
             }}
+            className="custom-drawer"
             extra={<p className="text-lg font-bold">Edit Material</p>}
             footer={
               <div
@@ -472,7 +474,7 @@ const ItemList = () => {
               value={searchText}
               onChange={(e) => handleSearch(e.target.value)}
               suffix={suffix}
-              className="custom-input bg-white dark:bg-zinc-400 dark:text-zinc-100"
+              className="custom-input bg-white dark:bg-zinc-800 dark:text-zinc-100"
             />
           </div>
           <Flex gap="middle" vertical>

@@ -177,7 +177,7 @@ const Header = () => {
       className={`h-16 flex items-center justify-between px-6 sticky top-0 z-10 overflow-x-hidden ${
         scrolled
           ? "bg-transparent backdrop-blur-sm shadow-md"
-          : "bg-white dark:bg-zinc-900 "
+          : "bg-transparent"
       }`}
       transition={{ duration: 0.6, ease: "easeInOut" }}
     >
@@ -655,8 +655,13 @@ const TitleSection = ({ open }) => {
       <div className="relative mb-3 border-b border-slate-300">
         {/* Main Dropdown Trigger */}
         <div
-          className="flex cursor-pointer items-center justify-between rounded-lg transition-all duration-200 p-2.5 mx-1"
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className={`flex items-center justify-between rounded-lg transition-all duration-200 p-2.5 mx-1 ${
+            session?.user?.role === "Admin" ? "" : "cursor-pointer"
+          }`}
+          onClick={() =>
+            session?.user?.role !== "Admin" &&
+            setIsDropdownOpen(!isDropdownOpen)
+          }
         >
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0">
@@ -665,7 +670,11 @@ const TitleSection = ({ open }) => {
             <motion.div className="overflow-hidden">
               {/* Nama Apotek (Selalu di baris pertama dan font lebih tebal) */}
               <span className="block text-sm font-semibold">
-                {selectedApotekName || "Pilih Apotek"}
+                {session?.user?.role === "Admin" ? (
+                  <div>Admin</div>
+                ) : (
+                  selectedApotekName || "Pilih Apotek"
+                )}
               </span>
 
               {/* Nama Cabang (Di baris kedua dengan font biasa) */}
@@ -674,22 +683,27 @@ const TitleSection = ({ open }) => {
                   {cabangData[selectedCabang]?.nama}
                 </span>
               ) : (
-                <span className="block text-xs font-normal">-</span>
+                <span className="block text-xs font-normal">
+                  {session?.user?.role === "Admin" ? <div>Superuser</div> : "-"}
+                </span>
               )}
             </motion.div>
           </div>
 
-          <motion.div
-            animate={{ rotate: isDropdownOpen ? 45 : 0 }}
-            transition={{ duration: 0.2 }}
-            className="text-gray-500"
-          >
-            <HiMiniChevronUpDown size={20} />
-          </motion.div>
+          {/* Hanya tampilkan ikon dropdown jika bukan Admin */}
+          {session?.user?.role !== "Admin" && (
+            <motion.div
+              animate={{ rotate: isDropdownOpen ? 45 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="text-gray-500"
+            >
+              <HiMiniChevronUpDown size={20} />
+            </motion.div>
+          )}
         </div>
 
-        {/* Enhanced Dropdown Menu */}
-        {isDropdownOpen && (
+        {/* Dropdown hanya muncul jika bukan Admin */}
+        {session?.user?.role !== "Admin" && isDropdownOpen && (
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
@@ -700,7 +714,7 @@ const TitleSection = ({ open }) => {
             {/* Apotek List */}
             {Object.keys(apotekData).map((apotekKey) => (
               <div key={apotekKey} className="relative group">
-                {/* Apotek Item - Now only handles expand/collapse */}
+                {/* Apotek Item */}
                 <div
                   className="px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-400 group"
                   onClick={(e) => {
@@ -709,12 +723,10 @@ const TitleSection = ({ open }) => {
                       setSelectedApotek(null); // Collapse if already expanded
                     } else {
                       setSelectedApotek(apotekKey);
-
                       fetchCabang(apotekKey);
                       setSelectedApotekName(
                         apotekData[Object.keys(apotekData)[apotekKey - 1]].nama
                       );
-                      // Fetch branches for new apotek
                     }
                   }}
                 >
@@ -754,11 +766,11 @@ const TitleSection = ({ open }) => {
                         <div
                           key={cabangKey}
                           className={`px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-indigo-200 dark:hover:bg-indigo-300
-                      ${
-                        selectedCabang === cabangKey
-                          ? "bg-indigo-300 dark:bg-indigo-400"
-                          : ""
-                      }`}
+                  ${
+                    selectedCabang === cabangKey
+                      ? "bg-indigo-300 dark:bg-indigo-400"
+                      : ""
+                  }`}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleSelectCabang(cabangKey);

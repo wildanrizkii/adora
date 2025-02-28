@@ -231,14 +231,14 @@ const LoginChart = () => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto rounded-md transition-all">
+    <div className="w-full max-w-5xl mx-auto rounded-md space-y-4 transition-all">
       <div className="space-y-1">
         <h2 className="text-xl font-medium">User Login Activity</h2>
         <div className="text-sm text-gray-500 dark:text-gray-400">
           Period {periodLabel}
         </div>
       </div>
-      <div className="mb-4 p-4 rounded-lg shadow-sm">
+      <div className="mb-4 rounded-lg">
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-3">
           {/* Input tanggal */}
           <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 w-full md:w-auto">
@@ -299,7 +299,7 @@ const LoginChart = () => {
           </div>
         </div>
       </div>
-      <div className="relative min-h-[380px] p-4 rounded-lg shadow-sm">
+      <div className="relative min-h-[380px] rounded-lg">
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-opacity-70 z-10">
             <div className="loader w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>

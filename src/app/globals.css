@@ -372,19 +372,19 @@ input:-webkit-autofill {
 }
 
 .dark .custom-input .ant-input {
-  background-color: #252525 !important;
+  background-color: transparent !important;
   color: white !important;
-  border: 1px solid #444 !important;
+  /* border: 1px solid #444 !important; */
 }
 
 .dark .custom-input .ant-input::placeholder {
   color: #aaaaaa !important;
 }
 
-.dark .custom-input .ant-input:focus {
+/* .dark .custom-input .ant-input:focus {
   border-color: #00b894 !important;
   box-shadow: 0 0 5px rgba(0, 184, 148, 0.5) !important;
-}
+} */
 
 /* Pastikan ini ada jika Ant Design masih override styling */
 .dark .ant-input {
