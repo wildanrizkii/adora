@@ -20,9 +20,9 @@ const LoginChart = () => {
       const { data, error } = await supabase
         .from("log_activity")
         .select("times")
-        // Filter berdasarkan periode yang dipilih
         .gte("times", `${start}T00:00:00`)
-        .lte("times", `${end}T23:59:59`);
+        .lte("times", `${end}T23:59:59`)
+        .eq("action", "Login");
 
       if (error) throw error;
 

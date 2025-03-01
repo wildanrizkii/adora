@@ -4,10 +4,14 @@ import { useSession } from "next-auth/react";
 import supabase from "@/app/utils/db";
 import { notification } from "antd";
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import logActivity from "@/components/Admin/ActivityLog/Login";
 
 const ProfileSettings = () => {
   const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const router = useRouter();
   const [profileData, setProfileData] = useState({
@@ -15,7 +19,9 @@ const ProfileSettings = () => {
     username: "",
     email: "",
     status: "",
+    profile_image_url: "",
   });
+  const [errors, setErrors] = useState({});
 
   function getInitials(name) {
     if (!name) return "";
@@ -50,7 +56,13 @@ const ProfileSettings = () => {
             username: data.username,
             email: data.email,
             status: data.role,
+            profile_image_url: data.profile_image_url,
           });
+
+          // Set image preview if user has a profile image
+          if (data.profile_image_url) {
+            setImagePreview(data.profile_image_url);
+          }
         }
       } catch (err) {
         console.error("Error fetching user data:", err);
@@ -70,11 +82,28 @@ const ProfileSettings = () => {
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+
+      // Check file size - 1MB = 1048576 bytes
+      if (file.size > 1048576) {
+        notification.error({
+          message: "Error",
+          description: "The file size must not exceed 1MB!",
+          placement: "top",
+          duration: 3,
+        });
+        // Reset file input
+        e.target.value = "";
+        return;
+      }
+
+      setImageFile(file);
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target.result);
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -84,20 +113,104 @@ const ProfileSettings = () => {
       ...profileData,
       [name]: value,
     });
+
+    // Clear error when typing
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: null,
+      });
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Validate name
+    if (!profileData.name) {
+      newErrors.name = "Profile name is required";
+    } else if (profileData.name.length < 4) {
+      newErrors.name = "Profile name must be at least 4 characters";
+    }
+
+    // Validate username
+    if (!profileData.username) {
+      newErrors.username = "Username is required";
+    } else if (profileData.username.length < 4) {
+      newErrors.username = "Username must be at least 4 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const uploadProfileImage = async (userId) => {
+    if (!imageFile) return profileData.profile_image_url;
+
+    try {
+      // Create a unique file name
+      const fileExt = imageFile.name.split(".").pop();
+      const fileName = `${userId}_${Date.now()}.${fileExt}`;
+      const filePath = `profile_images/${fileName}`;
+
+      // Upload the file to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from("profiles")
+        .upload(filePath, imageFile, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get the public URL
+      const { data } = supabase.storage.from("profiles").getPublicUrl(filePath);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw error;
+    }
+  };
+
+  const handleDeleteImage = async () => {
+    setImagePreview(null);
+    setImageFile(null);
+
+    // If there was a previously saved image, we'll set it to null during submission
+    setProfileData({
+      ...profileData,
+      profile_image_url: null,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
+
     try {
+      setSubmitting(true);
       const userId = session?.user?.id;
       if (!userId) {
         throw new Error("User ID is missing");
       }
 
+      // Upload image if a new one was selected
+      let profileImageUrl = profileData.profile_image_url;
+      if (imageFile) {
+        profileImageUrl = await uploadProfileImage(userId);
+      } else if (profileData.profile_image_url === null) {
+        // Handle deleted profile image if needed
+      }
+
       const updateData = {
         name: profileData.name,
         username: profileData.username,
+        profile_image_url: profileImageUrl,
       };
 
       const { error } = await supabase
@@ -116,7 +229,46 @@ const ProfileSettings = () => {
         duration: 5,
       });
 
-      // No need to refresh the session - data is already fetched from the database
+      // Update local state
+      setProfileData({
+        ...profileData,
+        profile_image_url: profileImageUrl,
+      });
+
+      // Menggunakan Axios untuk mengambil User-Agent
+      const response = await axios.get("/api/user-agent");
+      const userAgent = response.data?.userAgent || "Unknown";
+
+      const getBrowserName = (userAgent) => {
+        if (
+          userAgent.includes("Chrome") &&
+          !userAgent.includes("Edg") &&
+          !userAgent.includes("OPR")
+        ) {
+          return "Google Chrome";
+        } else if (userAgent.includes("Firefox")) {
+          return "Mozilla Firefox";
+        } else if (
+          userAgent.includes("Safari") &&
+          !userAgent.includes("Chrome")
+        ) {
+          return "Apple Safari";
+        } else if (userAgent.includes("Edg")) {
+          return "Microsoft Edge";
+        } else if (userAgent.includes("OPR") || userAgent.includes("Opera")) {
+          return "Opera";
+        } else {
+          return "Browser Tidak Dikenal";
+        }
+      };
+
+      await logActivity({
+        idUser: userId,
+        role: session?.user?.role,
+        action: "Change Profile",
+        detail: "Profile changed",
+        userAgent: getBrowserName(userAgent),
+      });
     } catch (err) {
       console.error("Error updating profile:", err);
       notification.error({
@@ -126,6 +278,7 @@ const ProfileSettings = () => {
         duration: 3,
       });
     } finally {
+      setSubmitting(false);
       router.refresh();
     }
   };
@@ -151,7 +304,7 @@ const ProfileSettings = () => {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="h-full w-full bg-indigo-400 flex items-center justify-center pb-0.5">
+                    <div className="h-full w-full bg-indigo-500 flex items-center justify-center pb-0.5">
                       <span className="text-xl text-white">
                         {getInitials(profileData.name)}
                       </span>
@@ -176,15 +329,18 @@ const ProfileSettings = () => {
                 <button
                   type="button"
                   className="text-red-500 hover:text-red-600 py-2 px-2 text-sm"
-                  onClick={() => setImagePreview(null)}
+                  onClick={handleDeleteImage}
+                  disabled={!imagePreview}
                 >
                   Delete picture
                 </button>
               </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Maksimal ukuran file: 1MB
+              </p>
             </div>
           </div>
 
-          {/* Rest of your form remains the same */}
           {/* Profile Name */}
           <div>
             <h3 className="text-sm font-medium mb-2">Profile name</h3>
@@ -193,14 +349,23 @@ const ProfileSettings = () => {
               name="name"
               value={profileData.name}
               onChange={handleInputChange}
-              className="ml-0.5 w-full p-2 border dark:bg-transparent border-gray-300 rounded-md"
+              className={`ml-0.5 w-full p-2 border dark:bg-transparent rounded-md ${
+                errors.name ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            )}
           </div>
 
           {/* Username */}
           <div>
             <h3 className="text-sm font-medium mb-2">Username</h3>
-            <div className="flex items-center w-full p-2 border border-gray-300 rounded-md dark:bg-transparent">
+            <div
+              className={`flex items-center w-full p-2 border rounded-md dark:bg-transparent ${
+                errors.username ? "border-red-500" : "border-gray-300"
+              }`}
+            >
               <input
                 type="text"
                 name="username"
@@ -209,6 +374,9 @@ const ProfileSettings = () => {
                 className="ml-0.5 w-full bg-transparent outline-none"
               />
             </div>
+            {errors.username && (
+              <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+            )}
           </div>
 
           {/* Email */}
@@ -224,9 +392,7 @@ const ProfileSettings = () => {
                 disabled
               />
             </div>
-            <p className="text-sm mt-1 text-gray-600 dark:text-gray-400">
-              Must contact the admin
-            </p>
+            <p className="text-sm mt-1 text-gray-600">Must contact the admin</p>
           </div>
 
           {/* Status */}
@@ -241,8 +407,9 @@ const ProfileSettings = () => {
           <button
             type="submit"
             className="bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-4 rounded-md disabled:opacity-50"
+            disabled={submitting}
           >
-            Save changes
+            {submitting ? "Saving..." : "Save changes"}
           </button>
         </div>
       </form>

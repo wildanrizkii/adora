@@ -22,7 +22,7 @@ import {
   FiShare,
   FiPlusSquare,
 } from "react-icons/fi";
-import { Avatar, Space, Dropdown, Badge, Tabs, Spin } from "antd";
+import { Avatar, Space, Dropdown, Badge, Tabs, Spin, Modal } from "antd";
 import { AiOutlineProduct, AiOutlineLogout } from "react-icons/ai";
 import { FaRegFileAlt, FaCloud } from "react-icons/fa";
 import { WiStars } from "react-icons/wi";
@@ -152,6 +152,16 @@ const Header = () => {
     return dayjs().format("dddd, D MMMM YYYY");
   };
 
+  function getInitials(name) {
+    if (!name) return "";
+    const words = name.trim().split(/\s+/);
+    if (words.length === 1) {
+      return words[0][0].toUpperCase();
+    } else {
+      return words[0][0].toUpperCase() + words[1][0].toUpperCase();
+    }
+  }
+
   const ringAnimation = {
     initial: { rotate: 0 },
     animate: isHovering
@@ -279,25 +289,13 @@ const Header = () => {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex justify-center mb-4">
-                      {true?.user?.image ? (
-                        <Avatar
-                          shape="circle"
-                          size={80}
-                          src={
-                            "https://api.dicebear.com/9.x/miniavs/svg?backgroundType=gradientLinear,solid"
-                          }
-                          className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
-                        />
-                      ) : (
-                        <Avatar
-                          shape="circle"
-                          size={80}
-                          src={
-                            "https://api.dicebear.com/9.x/miniavs/svg?backgroundType=gradientLinear,solid"
-                          }
-                          className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
-                        />
-                      )}
+                      <div className="h-16 w-16">
+                        <div className="h-full w-full rounded-full bg-indigo-500 flex items-center justify-center pb-0.5">
+                          <span className="pt-0.5 text-xl text-white">
+                            {getInitials(session?.user?.name)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                     <div className="space-y-8">
                       <div
@@ -336,7 +334,7 @@ const Header = () => {
                 );
               }}
             >
-              <Avatar
+              {/* <Avatar
                 shape="circle"
                 size={42}
                 src={
@@ -345,7 +343,15 @@ const Header = () => {
                 style={{ cursor: "pointer" }}
                 onClick={(e) => e.stopPropagation()}
                 className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
-              />
+              /> */}
+
+              <div className="h-11 w-11 cursor-pointer">
+                <div className="h-full w-full rounded-full bg-indigo-500 flex items-center justify-center pb-0.5">
+                  <span className="pt-0.5 text-md text-white">
+                    {getInitials(session?.user?.name)}
+                  </span>
+                </div>
+              </div>
             </Dropdown>
           </motion.span>
           {/* <motion.div
@@ -370,16 +376,211 @@ const clearSessionSelections = () => {
 };
 
 const Footer = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: "", content: "" });
+
+  const handleOpenModal = (title, content) => {
+    setModalContent({ title, content });
+    setIsModalOpen(true);
+  };
+
   return (
-    <motion.footer
-      layout
-      className="h-6 bg-transparent shadow-sm flex items-center justify-center mt-auto"
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-    >
-      <p className="text-xs">
-        &copy; 2025 Adora Pharmacy. All rights reserved.
-      </p>
-    </motion.footer>
+    <>
+      <motion.footer
+        layout
+        className="h-6 bg-transparent shadow-sm flex items-center justify-center mt-auto"
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
+        <div className="flex text-xs text-start gap-2 px-6 sm:px-0">
+          &copy; 2025 Adora Pharmacy. All rights reserved.
+          <div className="text-end space-x-2">
+            <button
+              className="underline hover:text-blue-500"
+              onClick={() =>
+                handleOpenModal(
+                  "Terms of Service",
+                  <div>
+                    <h2 className="text-lg font-semibold mb-2">
+                      Aktivitas Login
+                    </h2>
+                    <ul className="list-disc pl-5 mb-4">
+                      <li>
+                        Mencatat waktu login pengguna untuk melacak kapan
+                        terakhir kali akun digunakan.
+                      </li>
+                      <li>
+                        Menyimpan informasi browser yang digunakan saat login
+                        untuk mendeteksi anomali (misalnya login dari perangkat
+                        tidak dikenal).
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mb-2">
+                      Perubahan Profil
+                    </h2>
+                    <ul className="list-disc pl-5 mb-4">
+                      <li>
+                        Mencatat setiap perubahan data akun, seperti update nama
+                        atau email.
+                      </li>
+                      <li>
+                        Memastikan histori perubahan dapat ditinjau jika
+                        diperlukan.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mb-2">
+                      Aktivitas Mencurigakan (Percobaan Login Gagal)
+                    </h2>
+                    <ul className="list-disc pl-5 mb-4">
+                      <li>
+                        Jika seseorang mencoba login dengan username/email yang
+                        benar tetapi password salah, sistem akan mencatat:
+                      </li>
+                      <ul className="list-disc pl-6">
+                        <li>Alamat IP dari perangkat yang digunakan.</li>
+                        <li>Browser yang digunakan untuk percobaan login.</li>
+                        <li>
+                          Waktu percobaan login untuk melihat apakah ada pola
+                          serangan.
+                        </li>
+                      </ul>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mb-2">
+                      Tujuan Pencatatan Ini
+                    </h2>
+                    <ul className="list-disc pl-5">
+                      <li>
+                        <strong>Keamanan</strong>: Mencegah akses tidak sah ke
+                        akun pengguna.
+                      </li>
+                      <li>
+                        <strong>Monitoring</strong>: Memungkinkan pengguna dan
+                        admin melihat riwayat login & perubahan akun.
+                      </li>
+                      <li>
+                        <strong>Deteksi Dini</strong>: Jika ada aktivitas
+                        mencurigakan, sistem dapat memberikan peringatan atau
+                        melakukan tindakan pengamanan.
+                      </li>
+                    </ul>
+                  </div>
+                )
+              }
+            >
+              Terms of Service
+            </button>
+
+            <button
+              className="underline hover:text-blue-500"
+              onClick={() =>
+                handleOpenModal(
+                  "Privacy Policy",
+                  <div className="max-w-3xl mx-auto">
+                    <p>
+                      This Privacy Policy explains how we collect, use, and
+                      protect your data when using our website.
+                    </p>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      1. Information We Collect
+                    </h2>
+                    <p>We collect the following types of user data:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Identity Data: Name, email, and login details.</li>
+                      <li>
+                        Activity Data: Login records, profile changes, and
+                        failed login attempts.
+                      </li>
+                      <li>
+                        Device Data: IP address, browser type, and access time.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      2. How We Use Your Data
+                    </h2>
+                    <p>We use the collected data for:</p>
+                    <ul className="list-disc list-inside">
+                      <li>
+                        Security: Preventing unauthorized access and misuse of
+                        accounts.
+                      </li>
+                      <li>
+                        Monitoring: Tracking login history and profile changes.
+                      </li>
+                      <li>
+                        Service Improvement: Enhancing features based on user
+                        feedback.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      3. Data Storage and Protection
+                    </h2>
+                    <p>We take the following measures to secure your data:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Data is stored securely using encryption.</li>
+                      <li>
+                        We do not share personal data with third parties without
+                        consent.
+                      </li>
+                      <li>
+                        Only authorized admins can access security-related
+                        information.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      4. User Rights
+                    </h2>
+                    <p>Users have the right to:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Access their stored personal data.</li>
+                      <li>Request account and data deletion.</li>
+                      <li>Modify personal information at any time.</li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      5. Use of Cookies
+                    </h2>
+                    <p>We use cookies to:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Store user preferences for a better experience.</li>
+                      <li>Track login activity to improve security.</li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      6. Changes to Privacy Policy
+                    </h2>
+                    <p>
+                      This Privacy Policy may change over time. Users will be
+                      notified of any significant updates.
+                    </p>
+                    <p className="mt-4">Last updated: [Date]</p>
+                  </div>
+                )
+              }
+            >
+              Privacy Policy
+            </button>
+          </div>
+        </div>
+      </motion.footer>
+
+      {/* Modal */}
+      <div className="max-h-32 overflow-auto">
+        <Modal
+          title={modalContent.title}
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          footer={null}
+        >
+          <div>{modalContent.content}</div>
+        </Modal>
+      </div>
+    </>
   );
 };
 

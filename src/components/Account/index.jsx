@@ -4,13 +4,20 @@ import { motion } from "framer-motion";
 import { FiUser, FiLock } from "react-icons/fi";
 import ProfileSettings from "@/components/Account/ProfileTab";
 import PasswordChangeForm from "@/components/Account/PasswordTab";
+import { LuUserRoundPen } from "react-icons/lu";
+import { GoShieldLock } from "react-icons/go";
 
 const tabs = [
-  { id: "1", label: "Profile", icon: <FiUser />, content: <ProfileSettings /> },
+  {
+    id: "1",
+    label: "Profile",
+    icon: <LuUserRoundPen size={22} />,
+    content: <ProfileSettings />,
+  },
   {
     id: "2",
     label: "Security",
-    icon: <FiLock />,
+    icon: <GoShieldLock size={22} />,
     content: <PasswordChangeForm />,
   },
 ];
