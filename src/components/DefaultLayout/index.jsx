@@ -24,6 +24,7 @@ import {
 } from "react-icons/fi";
 import { Avatar, Space, Dropdown, Badge, Tabs, Spin, Modal } from "antd";
 import { AiOutlineProduct, AiOutlineLogout } from "react-icons/ai";
+import { PiSignOutBold } from "react-icons/pi";
 import { FaRegFileAlt, FaCloud } from "react-icons/fa";
 import { WiStars } from "react-icons/wi";
 import { IoIosNotificationsOutline } from "react-icons/io";
@@ -281,53 +282,127 @@ const Header = () => {
               trigger={["click"]}
               placement="bottomRight"
               arrow
-              className="rounded-full shadow-lg"
+              className="rounded-full"
               dropdownRender={() => {
                 return (
-                  <div
-                    className="cursor-default bg-white dark:bg-zinc-700 rounded-md p-6 shadow-lg min-w-xs border"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex justify-center mb-4">
-                      <div className="h-16 w-16">
-                        <div className="h-full w-full rounded-full bg-indigo-500 flex items-center justify-center pb-0.5">
-                          <span className="pt-0.5 text-xl text-white">
-                            {getInitials(session?.user?.name)}
-                          </span>
-                        </div>
+                  <div className="min-w-fit w-72 bg-white dark:bg-zinc-700 dark:text-white rounded-lg shadow-lg border border-gray-200">
+                    {/* Header with Logo and Website */}
+                    <div className="p-4 border-b border-gray-200 flex items-center">
+                      <div className="h-10 w-10 bg-indigo-400 rounded-full flex items-center justify-center mr-3">
+                        <span className="text-lg text-white">
+                          {getInitials(session?.user?.name)}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="font-medium">{session?.user?.name}</h3>
+                        <p className="text-sm">{session?.user?.email}</p>
                       </div>
                     </div>
-                    <div className="space-y-8">
-                      <div
-                        className="cursor-default text-center"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <h1 className="font-semibold dark:text-white">
-                          {session?.user?.name}
-                        </h1>
-                        <h1 className="font-normal dark:text-white">
-                          {session?.user?.role}
-                        </h1>
+
+                    {/* Navigation Menu */}
+                    <div className="py-2 cursor-pointer">
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+                          <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+                        </svg>
+                        <span>Dashboard</span>
                       </div>
 
-                      <div className="flex space-x-2">
-                        <Link href="/pengaturan/akun" className="flex-grow">
-                          <div className="flex shadow-md justify-center items-center p-3 gap-1 border text-indigo-600 hover:text-white bg-indigo-600 border-indigo-600 hover:border-indigo-700 hover:bg-indigo-700 rounded-md cursor-pointer transition-colors h-full">
-                            {/* <SettingOutlined /> */}
-                            <h1 className="mb-0.5 text-white ">
-                              Pengaturan Akun
-                            </h1>
-                          </div>
-                        </Link>
-                        <div
-                          className="flex shadow-md w-14 justify-center items-center p-4 gap-1 text-white text-lg bg-red-500 hover:bg-red-600 rounded-md cursor-pointer transition-colors"
-                          onClick={() => {
-                            signOut();
-                            clearSessionSelections(); //Jika setelah Logout perlu pilih ulang cabang
-                          }}
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
                         >
-                          <FiLogOut />
+                          <path
+                            fillRule="evenodd"
+                            d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>Settings</span>
+                      </div>
+
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        <span>Plugins</span>
+                      </div>
+
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>API Documentation</span>
+                      </div>
+
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>Help Center</span>
+                      </div>
+                    </div>
+
+                    {/* Plan Information */}
+                    {session?.user?.role === "Owner" ? (
+                      <div className="px-4 py-3 border-t border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium">Starter Plan</p>
+                            <p className="text-xs text-indigo-600 dark:text-indigo-400">
+                              29% OFF
+                            </p>
+                          </div>
+                          <button className="px-4 py-1 text-sm border border-gray-300 rounded-md bg-white dark:bg-zinc-500 hover:bg-gray-50 dark:hover:bg-zinc-600 transition-color">
+                            Upgrade
+                          </button>
                         </div>
+                      </div>
+                    ) : null}
+
+                    {/* Sign Out */}
+                    <div
+                      onClick={() => {
+                        signOut();
+                        clearSessionSelections(); //Jika setelah Logout perlu pilih ulang cabang
+                      }}
+                      className="px-4 py-3 border-t border-gray-200 rounded-b-lg hover:bg-zinc-50 dark:hover:bg-zinc-600 cursor-pointer"
+                    >
+                      <div className="flex items-center text-md gap-2">
+                        <FiLogOut size={19} />
+                        <span>Sign out</span>
                       </div>
                     </div>
                   </div>
@@ -558,7 +633,7 @@ const Footer = () => {
                       This Privacy Policy may change over time. Users will be
                       notified of any significant updates.
                     </p>
-                    <p className="mt-4">Last updated: [Date]</p>
+                    <p className="mt-4">Last updated: 01/03/2025</p>
                   </div>
                 )
               }

@@ -6,6 +6,9 @@ import ProfileSettings from "@/components/Account/ProfileTab";
 import PasswordChangeForm from "@/components/Account/PasswordTab";
 import { LuUserRoundPen } from "react-icons/lu";
 import { GoShieldLock } from "react-icons/go";
+import { BsShop, BsShopWindow } from "react-icons/bs";
+import MainStore from "@/components/Store/MainStore";
+import BranchStore from "@/components/Store/BranchStore";
 
 const tabs = [
   {
@@ -19,6 +22,18 @@ const tabs = [
     label: "Security",
     icon: <GoShieldLock size={22} />,
     content: <PasswordChangeForm />,
+  },
+  {
+    id: "3",
+    label: "Store",
+    icon: <BsShop size={22} />,
+    content: <MainStore />,
+  },
+  {
+    id: "4",
+    label: "Branch Store",
+    icon: <BsShopWindow size={22} />,
+    content: <BranchStore />,
   },
 ];
 
