@@ -1,17 +1,24 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { FiUser, FiLock } from "react-icons/fi";
 import ProfileSettings from "@/components/Account/ProfileTab";
 import PasswordChangeForm from "@/components/Account/PasswordTab";
 
 const tabs = [
-  { id: "1", label: "Profile", content: <ProfileSettings /> },
-  { id: "2", label: "Security", content: <PasswordChangeForm /> },
+  { id: "1", label: "Profile", icon: <FiUser />, content: <ProfileSettings /> },
+  {
+    id: "2",
+    label: "Security",
+    icon: <FiLock />,
+    content: <PasswordChangeForm />,
+  },
 ];
 
 const AccountPage = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -25,12 +32,13 @@ const AccountPage = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative pb-3 px-4 text-sm md:text-lg font-normal transition-all ${
+              className={`relative flex items-center gap-2 pb-3 px-4 text-sm md:text-lg font-normal transition-all ${
                 activeTab === tab.id
                   ? "text-blue-500 hover:text-blue-600 dark:text-blue-400"
                   : "text-black hover:text-blue-500 dark:text-white hover:dark:text-blue-400"
               }`}
             >
+              {tab.icon}
               {tab.label}
               {activeTab === tab.id && (
                 <motion.div

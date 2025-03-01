@@ -151,8 +151,8 @@ const ProfileSettings = () => {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <div className="h-full w-full bg-rose-200 flex items-center justify-center pb-0.5">
-                      <span className="text-xl">
+                    <div className="h-full w-full bg-indigo-400 flex items-center justify-center pb-0.5">
+                      <span className="text-xl text-white">
                         {getInitials(profileData.name)}
                       </span>
                     </div>
@@ -224,7 +224,9 @@ const ProfileSettings = () => {
                 disabled
               />
             </div>
-            <p className="text-sm mt-1 text-gray-600">Must contact the admin</p>
+            <p className="text-sm mt-1 text-gray-600 dark:text-gray-400">
+              Must contact the admin
+            </p>
           </div>
 
           {/* Status */}
@@ -238,7 +240,7 @@ const ProfileSettings = () => {
         <div className="mt-8 text-start">
           <button
             type="submit"
-            className="bg-gray-300 hover:bg-gray-400 py-2 px-4 rounded-md"
+            className="bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-4 rounded-md disabled:opacity-50"
           >
             Save changes
           </button>
