@@ -41,6 +41,7 @@ import { Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
 import supabase from "@/app/utils/db";
 import DashboardAdmin from "@/components/Admin/Dashboard";
+import AccountPage from "@/components/Account";
 
 dayjs.locale("id");
 
@@ -105,6 +106,8 @@ const DefaultLayout = ({ title, content }) => {
                 !isReady ? null : title === "Dashboard" &&
                   session?.user?.role === "Admin" ? (
                   <DashboardAdmin />
+                ) : title === "Account" && session?.user?.role === "Owner" ? (
+                  <AccountPage />
                 ) : (
                   content
                 )

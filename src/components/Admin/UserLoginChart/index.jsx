@@ -1,6 +1,6 @@
 "use client";
 
-import { Line } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 import { useEffect, useState } from "react";
 import supabase from "@/app/utils/db";
 import dayjs from "dayjs";
@@ -320,7 +320,7 @@ const LoginChart = () => {
           </div>
         )}
 
-        <Line data={chartData} options={options} />
+        <Bar data={chartData} options={options} />
       </div>
     </div>
   );
