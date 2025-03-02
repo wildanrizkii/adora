@@ -17,7 +17,15 @@ export async function middleware(req) {
   if (token) {
     const userRole = token.role;
     const roleAccess = {
-      Owner: ["/", "/cashier", "/products", "/account"],
+      Owner: [
+        "/",
+        "/cashier",
+        "/products",
+        "/account",
+        "/suppliers",
+        "/transactions",
+        "/reports",
+      ],
       Admin: ["/", "/account"],
       Karyawan: ["/cashier"],
     };
@@ -32,6 +40,9 @@ export async function middleware(req) {
       "/account",
       "/login",
       "/forbidden",
+      "/suppliers",
+      "/transactions",
+      "/reports",
     ];
 
     if (!existingPaths.includes(pathname)) {
