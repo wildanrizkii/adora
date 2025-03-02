@@ -107,7 +107,7 @@ const DefaultLayout = ({ title, content }) => {
                 !isReady ? null : title === "Dashboard" &&
                   session?.user?.role === "Admin" ? (
                   <DashboardAdmin />
-                ) : title === "Account" && session?.user?.role === "Owner" ? (
+                ) : title === "Accounts" && session?.user?.role === "Owner" ? (
                   <AccountPage />
                 ) : (
                   content
@@ -671,12 +671,12 @@ const menuItems = {
     },
     { title: "Suppliers", icon: FiBox, path: "/suppliers" },
     { title: "Transactions", icon: FiTag, path: "/transactions" },
-    { title: "Report", icon: FaRegFileAlt, path: "/reports" },
-    { title: "Account", icon: FiUsers, path: "/accounts" },
+    { title: "Reports", icon: FaRegFileAlt, path: "/reports" },
+    { title: "Accounts", icon: FiUsers, path: "/accounts" },
   ],
   Admin: [
     { title: "Dashboard", icon: LuLayoutDashboard, path: "/" },
-    { title: "Account", icon: FiUsers, path: "/account" },
+    { title: "Accounts", icon: FiUsers, path: "/account" },
   ],
   Karyawan: [{ title: "Cashier", icon: FiShoppingCart, path: "/cashier" }],
 };
