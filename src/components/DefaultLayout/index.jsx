@@ -476,68 +476,68 @@ const Footer = () => {
                   "Terms of Service",
                   <div>
                     <h2 className="text-lg font-semibold mb-2">
-                      Aktivitas Login
+                      Login Activity
                     </h2>
                     <ul className="list-disc pl-5 mb-4">
                       <li>
-                        Mencatat waktu login pengguna untuk melacak kapan
-                        terakhir kali akun digunakan.
+                        Records user login times to track the last time an
+                        account was accessed.
                       </li>
                       <li>
-                        Menyimpan informasi browser yang digunakan saat login
-                        untuk mendeteksi anomali (misalnya login dari perangkat
-                        tidak dikenal).
+                        Stores browser information used during login to detect
+                        anomalies (e.g., logins from unknown devices).
                       </li>
                     </ul>
 
                     <h2 className="text-lg font-semibold mb-2">
-                      Perubahan Profil
+                      Profile Changes
                     </h2>
                     <ul className="list-disc pl-5 mb-4">
                       <li>
-                        Mencatat setiap perubahan data akun, seperti update nama
-                        atau email.
+                        Logs any changes to account details, such as name or
+                        email updates.
                       </li>
                       <li>
-                        Memastikan histori perubahan dapat ditinjau jika
-                        diperlukan.
+                        Ensures a change history is available for review if
+                        needed.
                       </li>
                     </ul>
 
                     <h2 className="text-lg font-semibold mb-2">
-                      Aktivitas Mencurigakan (Percobaan Login Gagal)
+                      Suspicious Activity (Failed Login Attempts)
                     </h2>
                     <ul className="list-disc pl-5 mb-4">
                       <li>
-                        Jika seseorang mencoba login dengan username/email yang
-                        benar tetapi password salah, sistem akan mencatat:
+                        If someone attempts to log in with the correct
+                        username/email but an incorrect password, the system
+                        will record:
                       </li>
                       <ul className="list-disc pl-6">
-                        <li>Alamat IP dari perangkat yang digunakan.</li>
-                        <li>Browser yang digunakan untuk percobaan login.</li>
+                        <li>The IP address of the device used.</li>
+                        <li>The browser used for the login attempt.</li>
                         <li>
-                          Waktu percobaan login untuk melihat apakah ada pola
-                          serangan.
+                          The time of the login attempt to identify potential
+                          attack patterns.
                         </li>
                       </ul>
                     </ul>
 
                     <h2 className="text-lg font-semibold mb-2">
-                      Tujuan Pencatatan Ini
+                      Purpose of This Logging
                     </h2>
                     <ul className="list-disc pl-5">
                       <li>
-                        <strong>Keamanan</strong>: Mencegah akses tidak sah ke
-                        akun pengguna.
+                        <strong>Security</strong>: Prevents unauthorized access
+                        to user accounts.
                       </li>
                       <li>
-                        <strong>Monitoring</strong>: Memungkinkan pengguna dan
-                        admin melihat riwayat login & perubahan akun.
+                        <strong>Monitoring</strong>: Allows users and admins to
+                        review login history & account changes.
                       </li>
                       <li>
-                        <strong>Deteksi Dini</strong>: Jika ada aktivitas
-                        mencurigakan, sistem dapat memberikan peringatan atau
-                        melakukan tindakan pengamanan.
+                        <strong>Early Detection</strong>: If suspicious activity
+                        occurs, the system can issue warnings or take security
+                        actions.
                       </li>
                     </ul>
                   </div>

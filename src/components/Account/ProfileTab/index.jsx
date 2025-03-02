@@ -289,6 +289,12 @@ const ProfileSettings = () => {
 
   return (
     <div className="max-w-screen-lg mx-auto p-2">
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold">Manage Profile</h2>
+        <p className="text-sm text-gray-600">
+          Update your personal information to keep your account up to date
+        </p>
+      </div>
       <form onSubmit={handleSubmit}>
         <div className="space-y-6">
           {/* Profile Picture Section */}
@@ -336,7 +342,7 @@ const ProfileSettings = () => {
                 </button>
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Maksimal ukuran file: 1MB
+                The file size must not exceed 1MB
               </p>
             </div>
           </div>

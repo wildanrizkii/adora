@@ -167,23 +167,29 @@ const ShuffleHero = () => {
                 Log in
               </button>
             </Form>
-            <div className="mt-6 text-center text-gray-400">
-              <Divider plain={true} style={{ borderColor: "#dedede" }}>
+            <div className="mt-4 text-center text-gray-400">
+              <Divider
+                plain={true}
+                style={{ borderColor: "#dedede", color: "#ababab" }}
+              >
                 or
               </Divider>
             </div>
-            <Button
-              type="button"
-              //   onClick={handleCheck}
-              className="w-full h-10 border py-2 rounded-lg text-sm font-medium flex items-center justify-center space-x-2 bg-gray-100 hover:bg-gray-200 transition-all"
-            >
-              <img
-                src="/images/google-logo.png"
-                alt="Google"
-                className="w-4 h-4"
-              />
-              <span className="pb-0.5">Log in with Google</span>
-            </Button>
+            <div>
+              <Button
+                type="button"
+                //   onClick={handleCheck}
+                className="w-full h-10 border py-2 rounded-lg text-sm font-medium flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-all cursor-not-allowed"
+                disabled
+              >
+                <img
+                  src="/images/google-logo.png"
+                  alt="Google"
+                  className="w-4 h-4"
+                />
+                <span className="pb-0.5 text-zinc-800">Log in with Google</span>
+              </Button>
+            </div>
             <Footer />
           </div>
         </div>

@@ -54,7 +54,7 @@ const AccountPage = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative flex items-center gap-2 pb-3 px-4 text-sm md:text-lg font-normal transition-all ${
+              className={`relative flex items-center gap-2 pb-3 px-4 text-sm md:text-lg font-normal text-nowrap transition-all ${
                 activeTab === tab.id
                   ? "text-blue-500 hover:text-blue-600 dark:text-blue-400"
                   : "text-black hover:text-blue-500 dark:text-white hover:dark:text-blue-400"
