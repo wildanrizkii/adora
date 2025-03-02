@@ -433,7 +433,7 @@ const MainStore = () => {
 
   if (error && pharmacies.length === 0) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-6 bg-red-50 rounded-xl">
+      <div className="w-full max-w-4xl mx-auto p-6 bg-red-50 rounded-lg">
         <div className="text-center">
           <h2 className="text-xl font-medium text-red-700 mb-2">Error</h2>
           <p className="text-red-600">{error}</p>
@@ -444,7 +444,7 @@ const MainStore = () => {
 
   if (!user) {
     return (
-      <div className="w-full max-w-4xl mx-auto p-6 bg-yellow-50 rounded-xl">
+      <div className="w-full max-w-4xl mx-auto p-6 bg-yellow-50 rounded-lg">
         <div className="text-center">
           <h2 className="text-xl font-medium text-yellow-700 mb-2">
             Authentication Required
@@ -506,7 +506,7 @@ const MainStore = () => {
 
       {/* Add Pharmacy Form */}
       {isAddingPharmacy && (
-        <div className="mb-6 p-6 border border-gray-100 rounded-xl">
+        <div className="mb-6 p-6 border border-gray-100 rounded-lg">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium">New Pharmacy</h3>
             <button
@@ -575,11 +575,11 @@ const MainStore = () => {
 
           <div className="flex justify-end">
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleAddPharmacy}
               disabled={uploading || !newPharmacy.nama_apotek.trim()}
             >
-              Simpan
+              Save
             </button>
           </div>
         </div>
@@ -590,7 +590,7 @@ const MainStore = () => {
         {pharmacies.map((pharmacy) => (
           <div
             key={pharmacy.id_apotek}
-            className="border border-gray-100 rounded-xl overflow-hidden"
+            className="border border-gray-100 rounded-lg overflow-hidden"
           >
             {editingPharmacy &&
             editingPharmacy.id_apotek === pharmacy.id_apotek ? (
@@ -820,143 +820,129 @@ const MainStore = () => {
 
                 {/* Branch List */}
                 <div className="space-y-3">
-                  {pharmacy.branches.length === 0 &&
-                  isAddingBranch === false ? (
-                    <div className="grid gap-4 py-10 justify-center text-center text-sm bg-gray-50 dark:bg-zinc-800 rounded-lg">
-                      Belum ada cabang. Silakan tambahkan cabang baru.
-                      <button
-                        className="flex justify-center items-center gap-1 bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600 transition-colors"
-                        onClick={() => startAddBranch(pharmacy.id_apotek)}
-                      >
-                        <PlusCircle size={14} />
-                        <span>Tambah Cabang</span>
-                      </button>
-                    </div>
-                  ) : (
-                    pharmacy.branches.map((branch) => (
-                      <div
-                        key={branch.id_cabang}
-                        className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-lg"
-                      >
-                        {editingBranch &&
-                        editingBranch.id_cabang === branch.id_cabang ? (
-                          // Editing branch mode
-                          <div>
-                            <div className="flex justify-between items-center mb-3">
-                              <h5 className="font-medium">Edit Cabang</h5>
-                              <div className="flex gap-2">
-                                <button
-                                  className="p-1 text-gray-400 hover:text-gray-600"
-                                  onClick={() => setEditingBranch(null)}
-                                >
-                                  <X size={16} />
-                                </button>
-                                <button
-                                  className="p-1 text-green-500 hover:text-green-600"
-                                  onClick={saveEditedBranch}
-                                >
-                                  <Check size={16} />
-                                </button>
-                              </div>
+                  {pharmacy.branches.map((branch) => (
+                    <div
+                      key={branch.id_cabang}
+                      className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-lg"
+                    >
+                      {editingBranch &&
+                      editingBranch.id_cabang === branch.id_cabang ? (
+                        // Editing branch mode
+                        <div>
+                          <div className="flex justify-between items-center mb-3">
+                            <h5 className="font-medium">Edit Cabang</h5>
+                            <div className="flex gap-2">
+                              <button
+                                className="p-1 text-gray-400 hover:text-gray-600"
+                                onClick={() => setEditingBranch(null)}
+                              >
+                                <X size={16} />
+                              </button>
+                              <button
+                                className="p-1 text-green-500 hover:text-green-600"
+                                onClick={saveEditedBranch}
+                              >
+                                <Check size={16} />
+                              </button>
                             </div>
+                          </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-                              <div>
-                                <label className="block text-xs font-medium mb-1">
-                                  Nama Cabang
-                                </label>
-                                <input
-                                  type="text"
-                                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                  value={editingBranch.nama_cabang}
-                                  onChange={(e) =>
-                                    setEditingBranch({
-                                      ...editingBranch,
-                                      nama_cabang: e.target.value,
-                                    })
-                                  }
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-xs font-medium mb-1">
-                                  No. Telepon
-                                </label>
-                                <input
-                                  type="text"
-                                  className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                  value={editingBranch.telepon}
-                                  onChange={(e) =>
-                                    setEditingBranch({
-                                      ...editingBranch,
-                                      telepon: e.target.value,
-                                    })
-                                  }
-                                />
-                              </div>
-                            </div>
-
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                             <div>
                               <label className="block text-xs font-medium mb-1">
-                                Alamat
+                                Nama Cabang
                               </label>
                               <input
                                 type="text"
                                 className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                value={editingBranch.alamat}
+                                value={editingBranch.nama_cabang}
                                 onChange={(e) =>
                                   setEditingBranch({
                                     ...editingBranch,
-                                    alamat: e.target.value,
+                                    nama_cabang: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium mb-1">
+                                No. Telepon
+                              </label>
+                              <input
+                                type="text"
+                                className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                value={editingBranch.telepon}
+                                onChange={(e) =>
+                                  setEditingBranch({
+                                    ...editingBranch,
+                                    telepon: e.target.value,
                                   })
                                 }
                               />
                             </div>
                           </div>
-                        ) : (
-                          // Normal branch view
-                          <>
-                            <div className="flex justify-between">
-                              <h5 className="font-medium">
-                                {branch.nama_cabang}
-                              </h5>
-                              <div className="flex gap-2">
-                                <button
-                                  className="p-1 hover:text-blue-500"
-                                  onClick={() => startEditingBranch(branch)}
-                                >
-                                  <Pencil size={14} />
-                                </button>
-                                <button
-                                  className="p-1 hover:text-red-500"
-                                  onClick={() =>
-                                    handleDeleteBranch(pharmacy.id, branch.id)
-                                  }
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
+
+                          <div>
+                            <label className="block text-xs font-medium mb-1">
+                              Alamat
+                            </label>
+                            <input
+                              type="text"
+                              className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                              value={editingBranch.alamat}
+                              onChange={(e) =>
+                                setEditingBranch({
+                                  ...editingBranch,
+                                  alamat: e.target.value,
+                                })
+                              }
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        // Normal branch view
+                        <>
+                          <div className="flex justify-between">
+                            <h5 className="font-medium">
+                              {branch.nama_cabang}
+                            </h5>
+                            <div className="flex gap-2">
+                              <button
+                                className="p-1 hover:text-blue-500"
+                                onClick={() => startEditingBranch(branch)}
+                              >
+                                <Pencil size={14} />
+                              </button>
+                              <button
+                                className="p-1 hover:text-red-500"
+                                onClick={() =>
+                                  handleDeleteBranch(pharmacy.id, branch.id)
+                                }
+                              >
+                                <Trash2 size={14} />
+                              </button>
                             </div>
-                            <div className="mt-2 space-y-2">
-                              <div className="flex items-start gap-2">
-                                <MapPin
-                                  size={14}
-                                  className="text-gray-400 mt-0.5 flex-shrink-0"
-                                />
-                                <p className="text-sm">{branch.alamat}</p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Phone
-                                  size={14}
-                                  className="text-gray-400 flex-shrink-0"
-                                />
-                                <p className="text-sm">{branch.telepon}</p>
-                              </div>
+                          </div>
+                          <div className="mt-2 space-y-2">
+                            <div className="flex items-start gap-2">
+                              <MapPin
+                                size={14}
+                                className="text-gray-400 mt-0.5 flex-shrink-0"
+                              />
+                              <p className="text-sm">{branch.alamat}</p>
                             </div>
-                          </>
-                        )}
-                      </div>
-                    ))
-                  )}
+                            <div className="flex items-center gap-2">
+                              <Phone
+                                size={14}
+                                className="text-gray-400 flex-shrink-0"
+                              />
+                              <p className="text-sm">{branch.telepon}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
 
                   {!isAddingBranch && (
                     <div
@@ -978,7 +964,7 @@ const MainStore = () => {
         {isAddingPharmacy == false && (
           <div
             onClick={() => setIsAddingPharmacy(true)}
-            className="flex flex-col items-center justify-center py-12 bg-gray-50 dark:bg-zinc-700 rounded-xl cursor-pointer"
+            className="flex flex-col items-center justify-center py-12 bg-gray-50 dark:bg-zinc-700 rounded-lg cursor-pointer"
           >
             <Store size={48} className="text-gray-300 mb-3" />
             <p className="mb-6">Add your store</p>
