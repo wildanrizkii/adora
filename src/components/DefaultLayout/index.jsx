@@ -672,7 +672,7 @@ const menuItems = {
     { title: "Suppliers", icon: FiBox, path: "/suppliers" },
     { title: "Transactions", icon: FiTag, path: "/transactions" },
     { title: "Reports", icon: FaRegFileAlt, path: "/reports" },
-    { title: "Accounts", icon: FiUsers, path: "/accounts" },
+    { title: "Accounts", icon: FiUsers, path: "/account" },
   ],
   Admin: [
     { title: "Dashboard", icon: LuLayoutDashboard, path: "/" },
