@@ -193,7 +193,7 @@ const Header = () => {
       }`}
       transition={{ duration: 0.6, ease: "easeInOut" }}
     >
-      <h1 className="font-medium text-xs sm:text-lg line-clamp-2">
+      <h1 className="font-medium text-xs sm:text-lg line-clamp-2 mr-2">
         {getFormattedDate()}
       </h1>
 
@@ -1000,7 +1000,7 @@ const TitleSection = ({ open }) => {
       <div className="relative mb-3 border-b border-slate-300">
         {/* Main Dropdown Trigger */}
         <div
-          className={`flex items-center justify-between rounded-lg transition-all duration-200 p-2.5 mx-1 ${
+          className={`flex items-center justify-between rounded-lg transition-all duration-200 p-2 mx-1 ${
             session?.user?.role === "Admin" ? "" : "cursor-pointer"
           }`}
           onClick={() =>

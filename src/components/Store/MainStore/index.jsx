@@ -17,6 +17,7 @@ import {
 import supabase from "@/app/utils/db";
 import { useSession } from "next-auth/react";
 import { notification } from "antd";
+import { BsPlusCircle } from "react-icons/bs";
 
 const MainStore = () => {
   const [pharmacies, setPharmacies] = useState([]);
@@ -65,7 +66,6 @@ const MainStore = () => {
           setNewPharmacy((prev) => ({ ...prev, id_user: session?.user?.id }));
         }
       } catch (error) {
-        console.error("Error fetching user session:", error);
         setError("Failed to authenticate user. Please log in again.");
       }
     };
@@ -109,7 +109,6 @@ const MainStore = () => {
 
         setPharmacies(pharmaciesWithBranches);
       } catch (error) {
-        console.error("Error fetching data:", error);
         setError("Failed to load pharmacies and branches.");
       } finally {
         setLoading(false);
@@ -146,7 +145,6 @@ const MainStore = () => {
         setExpandedPharmacy(data[0].id_apotek);
       }
     } catch (error) {
-      console.error("Error adding pharmacy:", error);
       setError("Failed to add pharmacy.");
     }
   };
@@ -192,7 +190,6 @@ const MainStore = () => {
         setIsAddingBranch(false);
       }
     } catch (error) {
-      console.error("Error adding branch:", error);
       setError("Failed to add branch.");
     }
   };
@@ -219,7 +216,6 @@ const MainStore = () => {
         setExpandedPharmacy(null);
       }
     } catch (error) {
-      console.error("Error deleting pharmacy:", error);
       setError("Failed to delete pharmacy.");
     }
   };
@@ -266,7 +262,6 @@ const MainStore = () => {
 
       setPharmacies(updatedPharmacies);
     } catch (error) {
-      console.error("Error deleting branch:", error);
       setError("Failed to delete branch.");
     }
   };
@@ -300,7 +295,6 @@ const MainStore = () => {
       setPharmacies(updatedPharmacies);
       setEditingPharmacy(null);
     } catch (error) {
-      console.error("Error updating pharmacy:", error);
       setError("Failed to update pharmacy.");
     }
   };
@@ -343,7 +337,6 @@ const MainStore = () => {
       setPharmacies(updatedPharmacies);
       setEditingBranch(null);
     } catch (error) {
-      console.error("Error updating branch:", error);
       setError("Failed to update branch.");
     }
   };
@@ -415,7 +408,6 @@ const MainStore = () => {
         duration: 3,
       });
     } catch (error) {
-      console.error("Error uploading logo:", error);
       setError("Failed to upload logo.");
     } finally {
       setUploading(false);
@@ -502,23 +494,23 @@ const MainStore = () => {
       )}
 
       {/* Add Pharmacy Button */}
-      <div className="flex justify-end mb-6">
+      {/* <div className="flex justify-end mb-6">
         <button
           className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
           onClick={() => setIsAddingPharmacy(true)}
         >
           <PlusCircle size={18} />
-          <span>Tambah Apotek</span>
+          <span>Add Apotek</span>
         </button>
-      </div>
+      </div> */}
 
       {/* Add Pharmacy Form */}
       {isAddingPharmacy && (
-        <div className="mb-6 p-6 bg-gray-50 rounded-xl">
+        <div className="mb-6 p-6 border border-gray-100 rounded-xl">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium text-gray-800">Apotek Baru</h3>
+            <h3 className="text-lg font-medium">New Pharmacy</h3>
             <button
-              className="text-gray-400 hover:text-gray-600"
+              className="text-red-400 hover:text-red-500"
               onClick={() => setIsAddingPharmacy(false)}
             >
               <X size={20} />
@@ -527,12 +519,12 @@ const MainStore = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nama Apotek
+              <label className="block text-sm font-medium mb-2">
+                Pharmacy Name
               </label>
               <input
                 type="text"
-                className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={newPharmacy.nama_apotek}
                 onChange={(e) =>
                   setNewPharmacy({
@@ -540,16 +532,16 @@ const MainStore = () => {
                     nama_apotek: e.target.value,
                   })
                 }
-                placeholder="Masukkan nama apotek"
+                placeholder="Input pharmacy name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Logo Apotek
+              <label className="block text-sm font-medium mb-2">
+                Pharmacy Logo
               </label>
               <div className="flex items-center gap-4">
-                <div className="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                <div className="relative w-16 h-16 rounded-lg bg-gray-50 dark:bg-zinc-600 overflow-hidden flex items-center justify-center">
                   {newPharmacy.logo ? (
                     <img
                       src={newPharmacy.logo}
@@ -560,22 +552,22 @@ const MainStore = () => {
                     <Camera size={24} className="text-gray-400" />
                   )}
                   {uploading && (
-                    <div className="absolute inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-opacity-50 flex items-center justify-center">
                       <Loader2 size={24} className="text-white animate-spin" />
                     </div>
                   )}
                 </div>
                 <button
-                  className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-zinc-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={triggerFileInput}
-                  disabled={uploading || !editingPharmacy?.id_apotek} // Cek apakah `id_apotek` ada
+                  disabled={uploading} // Cek apakah `id_apotek` ada
                 >
                   {uploading ? (
                     <Loader2 size={16} className="animate-spin" />
                   ) : (
                     <Upload size={16} />
                   )}
-                  <span>{uploading ? "Uploading..." : "Ganti Logo"}</span>
+                  <span>{uploading ? "Uploading..." : "Change logo"}</span>
                 </button>
               </div>
             </div>
@@ -603,36 +595,34 @@ const MainStore = () => {
             {editingPharmacy &&
             editingPharmacy.id_apotek === pharmacy.id_apotek ? (
               // Editing pharmacy mode
-              <div className="p-5 bg-gray-50">
+              <div className="p-5">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-800">
-                    Edit Apotek
-                  </h3>
+                  <h3 className="text-lg font-medium">Edit Apotek</h3>
                   <div className="flex gap-2">
                     <button
-                      className="p-1 text-gray-400 hover:text-gray-600"
+                      className="p-1 hover:text-red-500"
                       onClick={() => setEditingPharmacy(null)}
                     >
-                      <X size={20} />
+                      Cancel
                     </button>
                     <button
                       className="p-1 text-green-500 hover:text-green-600"
                       onClick={saveEditedPharmacy}
                       disabled={uploading}
                     >
-                      <Check size={20} />
+                      Save
                     </button>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1">
                       Nama Apotek
                     </label>
                     <input
                       type="text"
-                      className="w-full p-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value={editingPharmacy.nama_apotek}
                       onChange={(e) =>
                         setEditingPharmacy({
@@ -644,11 +634,11 @@ const MainStore = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1">
                       Logo Apotek
                     </label>
                     <div className="flex items-center gap-4">
-                      <div className="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                      <div className="relative w-16 h-16 bg-zinc-200 dark:bg-zinc-700 rounded-lg overflow-hidden flex items-center justify-center">
                         {editingPharmacy.logo ? (
                           <img
                             src={editingPharmacy.logo}
@@ -668,7 +658,7 @@ const MainStore = () => {
                         )}
                       </div>
                       <button
-                        className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         onClick={triggerFileInput}
                         disabled={uploading || !editingPharmacy?.id_apotek} // Cek apakah `id_apotek` ada
                       >
@@ -677,7 +667,9 @@ const MainStore = () => {
                         ) : (
                           <Upload size={16} />
                         )}
-                        <span>{uploading ? "Uploading..." : "Ganti Logo"}</span>
+                        <span>
+                          {uploading ? "Uploading..." : "Change logo"}
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -686,7 +678,7 @@ const MainStore = () => {
             ) : (
               // Normal pharmacy view
               <div
-                className="flex justify-between items-center p-5 cursor-pointer hover:bg-gray-50 transition-colors"
+                className="flex justify-between items-center p-5 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
                 onClick={() => togglePharmacyExpand(pharmacy.id_apotek)}
               >
                 <div className="flex items-center gap-4">
@@ -702,9 +694,7 @@ const MainStore = () => {
                     )}
                   </div>
                   <div>
-                    <h3 className="font-medium text-gray-800">
-                      {pharmacy.nama_apotek}
-                    </h3>
+                    <h3 className="font-medium">{pharmacy.nama_apotek}</h3>
                     <p className="text-xs text-gray-400">
                       ID: {pharmacy.id_user}
                     </p>
@@ -712,7 +702,7 @@ const MainStore = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                    {pharmacy.branches.length} cabang
+                    {pharmacy.branches.length} branch
                   </span>
                   <button
                     className="p-1 text-gray-400 hover:text-blue-500"
@@ -745,24 +735,15 @@ const MainStore = () => {
             {expandedPharmacy === pharmacy.id_apotek && (
               <div className="p-5 pt-0 border-t border-gray-100">
                 <div className="flex justify-between items-center py-4">
-                  <h4 className="text-sm font-medium text-gray-700">Cabang</h4>
-                  <button
-                    className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600 transition-colors"
-                    onClick={() => startAddBranch(pharmacy.id_apotek)}
-                  >
-                    <PlusCircle size={14} />
-                    <span>Tambah Cabang</span>
-                  </button>
+                  <h4 className="text-sm font-medium">Cabang</h4>
                 </div>
 
                 {/* Add Branch Form */}
                 {isAddingBranch &&
                   newBranch.id_apotek === pharmacy.id_apotek && (
-                    <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+                    <div className="mb-4 p-4 bg-gray-50 dark:bg-zinc-800 rounded-lg">
                       <div className="flex justify-between items-center mb-3">
-                        <h5 className="font-medium text-gray-700">
-                          Cabang Baru
-                        </h5>
+                        <h5 className="font-medium">Cabang Baru</h5>
                         <button
                           className="text-gray-400 hover:text-gray-600"
                           onClick={() => setIsAddingBranch(false)}
@@ -773,7 +754,7 @@ const MainStore = () => {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">
+                          <label className="block text-xs font-medium mb-1">
                             Nama Cabang
                           </label>
                           <input
@@ -786,11 +767,11 @@ const MainStore = () => {
                                 nama_cabang: e.target.value,
                               })
                             }
-                            placeholder="Masukkan nama cabang"
+                            placeholder="Input branch name"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-700 mb-1">
+                          <label className="block text-xs font-medium mb-1">
                             No. Telepon
                           </label>
                           <input
@@ -803,13 +784,13 @@ const MainStore = () => {
                                 telepon: e.target.value,
                               })
                             }
-                            placeholder="Masukkan nomor telepon"
+                            placeholder="Input phone number"
                           />
                         </div>
                       </div>
 
                       <div className="mb-4">
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium mb-1">
                           Alamat
                         </label>
                         <input
@@ -822,7 +803,7 @@ const MainStore = () => {
                               alamat: e.target.value,
                             })
                           }
-                          placeholder="Masukkan alamat lengkap"
+                          placeholder="Input address"
                         />
                       </div>
 
@@ -831,7 +812,7 @@ const MainStore = () => {
                           className="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                           onClick={handleAddBranch}
                         >
-                          Simpan
+                          Save
                         </button>
                       </div>
                     </div>
@@ -839,24 +820,30 @@ const MainStore = () => {
 
                 {/* Branch List */}
                 <div className="space-y-3">
-                  {pharmacy.branches.length === 0 ? (
-                    <div className="py-4 text-center text-gray-500 text-sm bg-gray-50 rounded-lg">
+                  {pharmacy.branches.length === 0 &&
+                  isAddingBranch === false ? (
+                    <div className="grid gap-4 py-10 justify-center text-center text-sm bg-gray-50 dark:bg-zinc-800 rounded-lg">
                       Belum ada cabang. Silakan tambahkan cabang baru.
+                      <button
+                        className="flex justify-center items-center gap-1 bg-green-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-600 transition-colors"
+                        onClick={() => startAddBranch(pharmacy.id_apotek)}
+                      >
+                        <PlusCircle size={14} />
+                        <span>Tambah Cabang</span>
+                      </button>
                     </div>
                   ) : (
                     pharmacy.branches.map((branch) => (
                       <div
                         key={branch.id_cabang}
-                        className="p-4 bg-gray-50 rounded-lg"
+                        className="p-4 bg-gray-50 dark:bg-zinc-800 rounded-lg"
                       >
                         {editingBranch &&
                         editingBranch.id_cabang === branch.id_cabang ? (
                           // Editing branch mode
                           <div>
                             <div className="flex justify-between items-center mb-3">
-                              <h5 className="font-medium text-gray-700">
-                                Edit Cabang
-                              </h5>
+                              <h5 className="font-medium">Edit Cabang</h5>
                               <div className="flex gap-2">
                                 <button
                                   className="p-1 text-gray-400 hover:text-gray-600"
@@ -875,7 +862,7 @@ const MainStore = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                               <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium mb-1">
                                   Nama Cabang
                                 </label>
                                 <input
@@ -891,7 +878,7 @@ const MainStore = () => {
                                 />
                               </div>
                               <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium mb-1">
                                   No. Telepon
                                 </label>
                                 <input
@@ -909,7 +896,7 @@ const MainStore = () => {
                             </div>
 
                             <div>
-                              <label className="block text-xs font-medium text-gray-700 mb-1">
+                              <label className="block text-xs font-medium mb-1">
                                 Alamat
                               </label>
                               <input
@@ -929,18 +916,18 @@ const MainStore = () => {
                           // Normal branch view
                           <>
                             <div className="flex justify-between">
-                              <h5 className="font-medium text-gray-800">
+                              <h5 className="font-medium">
                                 {branch.nama_cabang}
                               </h5>
                               <div className="flex gap-2">
                                 <button
-                                  className="p-1 text-gray-400 hover:text-blue-500"
+                                  className="p-1 hover:text-blue-500"
                                   onClick={() => startEditingBranch(branch)}
                                 >
                                   <Pencil size={14} />
                                 </button>
                                 <button
-                                  className="p-1 text-gray-400 hover:text-red-500"
+                                  className="p-1 hover:text-red-500"
                                   onClick={() =>
                                     handleDeleteBranch(pharmacy.id, branch.id)
                                   }
@@ -955,18 +942,14 @@ const MainStore = () => {
                                   size={14}
                                   className="text-gray-400 mt-0.5 flex-shrink-0"
                                 />
-                                <p className="text-sm text-gray-600">
-                                  {branch.alamat}
-                                </p>
+                                <p className="text-sm">{branch.alamat}</p>
                               </div>
                               <div className="flex items-center gap-2">
                                 <Phone
                                   size={14}
                                   className="text-gray-400 flex-shrink-0"
                                 />
-                                <p className="text-sm text-gray-600">
-                                  {branch.telepon}
-                                </p>
+                                <p className="text-sm">{branch.telepon}</p>
                               </div>
                             </div>
                           </>
@@ -974,24 +957,33 @@ const MainStore = () => {
                       </div>
                     ))
                   )}
+
+                  {!isAddingBranch && (
+                    <div
+                      onClick={() => startAddBranch(pharmacy.id_apotek)}
+                      className="grid gap-4 py-10 justify-center text-center text-sm bg-gray-50 dark:bg-zinc-800 rounded-lg cursor-pointer"
+                    >
+                      Add branch of your store
+                      <div className="flex justify-center">
+                        <PlusCircle size={28} />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </div>
         ))}
 
-        {pharmacies.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-12 bg-gray-50 rounded-xl">
+        {isAddingPharmacy == false && (
+          <div
+            onClick={() => setIsAddingPharmacy(true)}
+            className="flex flex-col items-center justify-center py-12 bg-gray-50 dark:bg-zinc-700 rounded-xl cursor-pointer"
+          >
             <Store size={48} className="text-gray-300 mb-3" />
-            <p className="text-gray-500 mb-6">
-              Belum ada apotek yang terdaftar
-            </p>
-            <button
-              className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-              onClick={() => setIsAddingPharmacy(true)}
-            >
-              <PlusCircle size={18} />
-              <span>Tambah Apotek</span>
+            <p className="mb-6">Add your store</p>
+            <button className="flex items-center gap-2 px-4 py-2 transition-colors">
+              <BsPlusCircle size={28} />
             </button>
           </div>
         )}
