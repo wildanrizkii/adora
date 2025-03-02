@@ -4,7 +4,7 @@ import { useMediaQuery } from "react-responsive";
 import Link from "next/link";
 import dayjs from "dayjs";
 import "dayjs/locale/id";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   FiBarChart,
   FiChevronDown,
@@ -800,7 +800,6 @@ const Option = ({ Icon, title, path, selected, setSelected, open, notifs }) => {
 };
 
 const TitleSection = ({ open }) => {
-  const { resolvedTheme } = useTheme();
   const [apotekData, setApotekData] = useState({});
   const [cabangData, setCabangData] = useState({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -808,20 +807,47 @@ const TitleSection = ({ open }) => {
   const [selectedCabang, setSelectedCabang] = useState(null);
   const [selectedApotekName, setSelectedApotekName] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
   let { data: session } = useSession();
 
-  const handleSelectApotek = (id_apotek) => {
+  const handleSelectApotek = async (id_apotek) => {
     if (selectedApotek === id_apotek) {
+      // console.log("Menghapus apotek dari sessionStorage");
       setSelectedApotek(null);
+      setSelectedCabang(null);
+      setCabangData({});
+      sessionStorage.removeItem("selectedApotek");
+      sessionStorage.removeItem("selectedCabang");
     } else {
+      // console.log("Menyimpan apotek ke sessionStorage:", id_apotek);
       setSelectedApotek(id_apotek);
-      fetchCabang(id_apotek);
+      setSelectedApotekName(apotekData[id_apotek]?.nama);
+
+      const { data } = await supabase
+        .from("cabang")
+        .select("*")
+        .eq("id_apotek", id_apotek)
+        .order("nama_cabang", { ascending: true }); // Tambahkan sorting
+
+      if (data.length > 0) {
+        const firstCabang = data[0];
+        setSelectedCabang(firstCabang.id_cabang);
+        sessionStorage.setItem("selectedCabang", firstCabang.id_cabang);
+      }
+
+      const cabangObject = data.reduce((acc, row) => {
+        acc[row.id_cabang] = { nama: row.nama_cabang };
+        return acc;
+      }, {});
+
+      setCabangData(cabangObject);
     }
   };
 
   const handleSelectCabang = (id_cabang) => {
     setSelectedCabang(id_cabang);
     setIsDropdownOpen(false);
+    window.location.reload();
   };
 
   const fetchApotek = async () => {
@@ -843,30 +869,33 @@ const TitleSection = ({ open }) => {
       console.error("Error while fetching data Apotek: ", error.message);
     }
   };
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from("cabang")
+  //       .select("*")
+  //       .eq("id_apotek", id_apotek);
 
-  const fetchCabang = async (id_apotek) => {
-    try {
-      const { data, error } = await supabase
-        .from("cabang")
-        .select("*")
-        .eq("id_apotek", id_apotek);
+  //     if (error) throw error;
 
-      if (error) throw error;
+  //     const cabangObject = data.reduce((acc, row) => {
+  //       acc[row.id_cabang] = { nama: row.nama_cabang };
+  //       return acc;
+  //     }, {});
 
-      const cabangObject = data.reduce((acc, row) => {
-        acc[row.id_cabang] = {
-          nama: row.nama_cabang,
-          // Simpan data tambahan cabang jika diperlukan
-        };
-        return acc;
-      }, {});
+  //     setCabangData(cabangObject);
 
-      setCabangData(cabangObject);
-    } catch (error) {
-      console.error("Error while fetching data Cabang Apotek: ", error);
-      // Tambahkan handling error yang sesuai
-    }
-  };
+  //     // Otomatis pilih cabang pertama jika ada
+  //     if (data.length > 0) {
+  //       setSelectedCabang(data[0].id_cabang);
+  //       sessionStorage.setItem("selectedCabang", data[0].id_cabang);
+  //     } else {
+  //       setSelectedCabang(null);
+  //       sessionStorage.removeItem("selectedCabang");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error while fetching data Cabang Apotek: ", error);
+  //   }
+  // };
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -884,18 +913,54 @@ const TitleSection = ({ open }) => {
 
       if (savedApotek) {
         setSelectedApotek(savedApotek);
-        fetchCabang(savedApotek);
-      }
+        setSelectedApotekName(savedApotekName || "");
 
-      if (savedApotekName) {
-        setSelectedApotekName(savedApotekName);
-      }
-
-      if (savedCabang) {
-        setSelectedCabang(savedCabang);
+        fetchAndSelectCabang(savedApotek, savedCabang);
       }
     }
-  }, [session]);
+  }, [session]); // Pastikan hanya berjalan saat session berubah
+
+  // Pindahkan fungsi fetch di luar useEffect
+  const fetchAndSelectCabang = async (id_apotek, savedCabang) => {
+    // console.log("Fetching cabang untuk apotek:", id_apotek);
+    const { data } = await supabase
+      .from("cabang")
+      .select("*")
+      .eq("id_apotek", id_apotek)
+      .order("nama_cabang", { ascending: true });
+
+    // console.log("Data cabang yang diambil:", data);
+
+    if (data.length > 0) {
+      const firstCabang = savedCabang || data[0].id_cabang;
+      // console.log("Cabang yang dipilih setelah fetch:", firstCabang);
+
+      sessionStorage.setItem("selectedCabang", firstCabang);
+      setSelectedCabang(firstCabang);
+    } else {
+      // console.log("Tidak ada cabang tersedia untuk apotek ini.");
+
+      // 🔴 Hapus sessionStorage jika tidak ada cabang
+      sessionStorage.removeItem("selectedCabang");
+      setSelectedCabang(null);
+    }
+
+    const cabangObject = data.reduce((acc, row) => {
+      acc[row.id_cabang] = { nama: row.nama_cabang };
+      return acc;
+    }, {});
+    setCabangData(cabangObject);
+  };
+
+  // ✅ Tambahkan useEffect ini untuk membaca ulang sessionStorage setelah fetch selesai
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const updatedCabang = sessionStorage.getItem("selectedCabang");
+      if (updatedCabang) {
+        setSelectedCabang(updatedCabang);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (selectedApotek) {
@@ -905,6 +970,9 @@ const TitleSection = ({ open }) => {
       sessionStorage.removeItem("selectedApotek");
       sessionStorage.removeItem("selectedApotekName");
     }
+    // console.log("Session Storage saat halaman dimuat:");
+    // console.log("selectedApotek:", sessionStorage.getItem("selectedApotek"));
+    // console.log("selectedCabang:", sessionStorage.getItem("selectedCabang"));
   }, [selectedApotek]);
 
   useEffect(() => {
@@ -949,8 +1017,11 @@ const TitleSection = ({ open }) => {
               <span className="block text-sm font-semibold">
                 {session?.user?.role === "Admin" ? (
                   <div>Admin</div>
+                ) : selectedApotekName !== undefined &&
+                  selectedApotekName !== null ? (
+                  selectedApotekName
                 ) : (
-                  selectedApotekName || "Pilih Apotek"
+                  "Pilih Apotek"
                 )}
               </span>
 
@@ -996,15 +1067,7 @@ const TitleSection = ({ open }) => {
                   className="px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-400 group"
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (selectedApotek === apotekKey) {
-                      setSelectedApotek(null); // Collapse if already expanded
-                    } else {
-                      setSelectedApotek(apotekKey);
-                      fetchCabang(apotekKey);
-                      setSelectedApotekName(
-                        apotekData[Object.keys(apotekData)[apotekKey - 1]].nama
-                      );
-                    }
+                    handleSelectApotek(apotekKey);
                   }}
                 >
                   <div className="flex items-center justify-between">
@@ -1051,6 +1114,7 @@ const TitleSection = ({ open }) => {
                           onClick={(e) => {
                             e.stopPropagation();
                             handleSelectCabang(cabangKey);
+                            router.prefetch("/products");
                           }}
                         >
                           <div className="flex items-center gap-3">
