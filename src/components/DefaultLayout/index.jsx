@@ -26,6 +26,7 @@ import { Avatar, Space, Dropdown, Badge, Tabs, Spin, Modal } from "antd";
 import { AiOutlineProduct, AiOutlineLogout } from "react-icons/ai";
 import { PiSignOutBold } from "react-icons/pi";
 import { FaRegFileAlt, FaCloud } from "react-icons/fa";
+import { AiOutlinePlus } from "react-icons/ai";
 import { WiStars } from "react-icons/wi";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -1060,82 +1061,96 @@ const TitleSection = ({ open }) => {
             style={{ originY: "top", translateX: "-50%" }}
           >
             {/* Apotek List */}
-            {Object.keys(apotekData).map((apotekKey) => (
-              <div key={apotekKey} className="relative group">
-                {/* Apotek Item */}
-                <div
-                  className="px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-400 group"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleSelectApotek(apotekKey);
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0">
-                        <Logo />
-                      </div>
-                      <span className="font-medium">
-                        {apotekData[apotekKey]?.nama}
-                      </span>
-                    </div>
-                    <motion.div
-                      animate={{
-                        rotate: selectedApotek === apotekKey ? 45 : 0,
-                      }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <HiMiniChevronUpDown size={16} />
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* Animated Cabang Submenu */}
-                <motion.div
-                  initial={false}
-                  animate={{
-                    height: selectedApotek === apotekKey ? "auto" : 0,
-                    opacity: selectedApotek === apotekKey ? 1 : 0,
-                  }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <div className="pl-4 mt-1">
-                    {Object.keys(cabangData).length > 0 ? (
-                      Object.keys(cabangData).map((cabangKey) => (
-                        <div
-                          key={cabangKey}
-                          className={`px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-indigo-200 dark:hover:bg-indigo-300
-                  ${
-                    selectedCabang === cabangKey
-                      ? "bg-indigo-300 dark:bg-indigo-400"
-                      : ""
-                  }`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectCabang(cabangKey);
-                            router.prefetch("/products");
-                          }}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="flex-shrink-0">
-                              <BsShop className="text-lg" />
-                            </div>
-                            <span className="font-medium">
-                              {cabangData[cabangKey]?.nama}
-                            </span>
-                          </div>
+            {Object.keys(apotekData).length > 0 ? (
+              Object.keys(apotekData).map((apotekKey) => (
+                <div key={apotekKey} className="relative group">
+                  {/* Apotek Item */}
+                  <div
+                    className="px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-400 group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelectApotek(apotekKey);
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0">
+                          <Logo />
                         </div>
-                      ))
-                    ) : (
-                      <div className="px-4 py-3 text-center text-sm italic">
-                        Tidak ada cabang tersedia
+                        <span className="font-medium">
+                          {apotekData[apotekKey]?.nama}
+                        </span>
                       </div>
-                    )}
+                      <motion.div
+                        animate={{
+                          rotate: selectedApotek === apotekKey ? 45 : 0,
+                        }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <HiMiniChevronUpDown size={16} />
+                      </motion.div>
+                    </div>
                   </div>
-                </motion.div>
+
+                  {/* Animated Cabang Submenu */}
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      height: selectedApotek === apotekKey ? "auto" : 0,
+                      opacity: selectedApotek === apotekKey ? 1 : 0,
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pl-4 mt-1">
+                      {Object.keys(cabangData).length > 0 ? (
+                        Object.keys(cabangData).map((cabangKey) => (
+                          <div
+                            key={cabangKey}
+                            className={`px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-indigo-200 dark:hover:bg-indigo-300
+                ${
+                  selectedCabang === cabangKey
+                    ? "bg-indigo-300 dark:bg-indigo-400"
+                    : ""
+                }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectCabang(cabangKey);
+                              router.prefetch("/products");
+                            }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0">
+                                <BsShop className="text-lg" />
+                              </div>
+                              <span className="font-medium">
+                                {cabangData[cabangKey]?.nama}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-center text-sm italic">
+                          Tidak ada cabang tersedia
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                </div>
+              ))
+            ) : (
+              <div className="grid justify-center items-center py-2 space-y-2">
+                <div className="text-sm">You don't have any stores</div>
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => router.push("/account")}
+                    className="flex items-center justify-center gap-1 px-4 pb-1.5 pt-1 shadow-md bg-emerald-600 text-sm text-white rounded-md hover:bg-emerald-700 transition-all"
+                  >
+                    <AiOutlinePlus size={14} /> Add Store
+                  </button>
+                </div>
               </div>
-            ))}
+            )}
           </motion.div>
         )}
       </div>
