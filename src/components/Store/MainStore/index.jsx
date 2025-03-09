@@ -18,6 +18,7 @@ import supabase from "@/app/utils/db";
 import { useSession } from "next-auth/react";
 import { notification } from "antd";
 import { BsPlusCircle } from "react-icons/bs";
+import { useRouter } from "next/navigation";
 
 const MainStore = () => {
   const [pharmacies, setPharmacies] = useState([]);
@@ -25,6 +26,14 @@ const MainStore = () => {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const { data: session } = useSession();
+  const [editingPharmacy, setEditingPharmacy] = useState(null);
+  const [editingBranch, setEditingBranch] = useState(null);
+  const [expandedPharmacy, setExpandedPharmacy] = useState(null);
+  const [isAddingPharmacy, setIsAddingPharmacy] = useState(false);
+  const [isAddingBranch, setIsAddingBranch] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const router = useRouter();
 
   const [newPharmacy, setNewPharmacy] = useState({
     nama_apotek: "",
@@ -38,13 +47,6 @@ const MainStore = () => {
     telepon: "",
     id_apotek: "",
   });
-
-  const [editingPharmacy, setEditingPharmacy] = useState(null);
-  const [editingBranch, setEditingBranch] = useState(null);
-  const [expandedPharmacy, setExpandedPharmacy] = useState(null);
-  const [isAddingPharmacy, setIsAddingPharmacy] = useState(false);
-  const [isAddingBranch, setIsAddingBranch] = useState(false);
-  const [uploading, setUploading] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -74,47 +76,47 @@ const MainStore = () => {
   }, [session]);
 
   // Fetch pharmacies and branches when user is available
+
+  const fetchPharmacies = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch pharmacies for the current user
+      const { data: pharmaciesData, error: pharmaciesError } = await supabase
+        .from("apotek")
+        .select("*")
+        .eq("id_user", user.id);
+
+      if (pharmaciesError) throw pharmaciesError;
+
+      // Create an array to store pharmacies with their branches
+      const pharmaciesWithBranches = [];
+
+      // Fetch branches for each pharmacy
+      for (const pharmacy of pharmaciesData) {
+        const { data: branchesData, error: branchesError } = await supabase
+          .from("cabang")
+          .select("*")
+          .eq("id_apotek", pharmacy.id_apotek);
+
+        if (branchesError) throw branchesError;
+
+        pharmaciesWithBranches.push({
+          ...pharmacy,
+          branches: branchesData || [],
+        });
+      }
+
+      setPharmacies(pharmaciesWithBranches);
+    } catch (error) {
+      setError("Failed to load pharmacies and branches.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
-
-    const fetchPharmacies = async () => {
-      try {
-        setLoading(true);
-
-        // Fetch pharmacies for the current user
-        const { data: pharmaciesData, error: pharmaciesError } = await supabase
-          .from("apotek")
-          .select("*")
-          .eq("id_user", user.id);
-
-        if (pharmaciesError) throw pharmaciesError;
-
-        // Create an array to store pharmacies with their branches
-        const pharmaciesWithBranches = [];
-
-        // Fetch branches for each pharmacy
-        for (const pharmacy of pharmaciesData) {
-          const { data: branchesData, error: branchesError } = await supabase
-            .from("cabang")
-            .select("*")
-            .eq("id_apotek", pharmacy.id_apotek);
-
-          if (branchesError) throw branchesError;
-
-          pharmaciesWithBranches.push({
-            ...pharmacy,
-            branches: branchesData || [],
-          });
-        }
-
-        setPharmacies(pharmaciesWithBranches);
-      } catch (error) {
-        setError("Failed to load pharmacies and branches.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPharmacies();
   }, [user, expandedPharmacy]);
 
@@ -217,52 +219,25 @@ const MainStore = () => {
       }
     } catch (error) {
       setError("Failed to delete pharmacy.");
+    } finally {
+      router.refresh();
     }
   };
 
-  const handleDeleteBranch = async (id_cabang) => {
+  const handleDeleteBranch = async (id_cabang, id_apotek) => {
     if (!id_cabang) return;
 
     try {
-      // Find the branch's pharmacy ID first
-      let pharmacyId = null;
-      let branchToDelete = null;
-
-      for (const pharmacy of pharmacies) {
-        const branch = pharmacy.branches.find((b) => b.id_cabang === id_cabang);
-        if (branch) {
-          pharmacyId = pharmacy.id_apotek;
-          branchToDelete = branch;
-          break;
-        }
-      }
-
-      if (!pharmacyId || !branchToDelete) return;
-
-      // Delete branch by ID
       const { error } = await supabase
         .from("cabang")
         .delete()
         .eq("id_cabang", id_cabang);
 
       if (error) throw error;
-
-      // Update state after successful deletion
-      const updatedPharmacies = pharmacies.map((pharmacy) => {
-        if (pharmacy.id_apotek === pharmacyId) {
-          return {
-            ...pharmacy,
-            branches: pharmacy.branches.filter(
-              (branch) => branch.id_cabang !== id_cabang
-            ),
-          };
-        }
-        return pharmacy;
-      });
-
-      setPharmacies(updatedPharmacies);
     } catch (error) {
       setError("Failed to delete branch.");
+    } finally {
+      fetchPharmacies();
     }
   };
 
@@ -482,14 +457,20 @@ const MainStore = () => {
 
       {/* Error message display */}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg">
-          {error}
-          <button
-            className="ml-2 text-red-500 font-medium hover:text-red-700"
-            onClick={() => setError(null)}
-          >
-            Dismiss
-          </button>
+        <div className="grid mb-4 p-3 bg-red-50 text-red-700 rounded-lg space-y-2">
+          <div className="flex justify-between">
+            {error}
+            <button
+              className="ml-2 text-red-500 hover:text-red-700"
+              onClick={() => setError(null)}
+            >
+              Close
+            </button>
+          </div>
+          <div className="text-sm">
+            Pharmacy has branches, to delete a pharmacy, it is necessary to
+            delete the branch first
+          </div>
         </div>
       )}
 
@@ -503,87 +484,6 @@ const MainStore = () => {
           <span>Add Apotek</span>
         </button>
       </div> */}
-
-      {/* Add Pharmacy Form */}
-      {isAddingPharmacy && (
-        <div className="mb-6 p-6 border border-gray-100 rounded-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-medium">New Pharmacy</h3>
-            <button
-              className="text-red-400 hover:text-red-500"
-              onClick={() => setIsAddingPharmacy(false)}
-            >
-              <X size={20} />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Pharmacy Name
-              </label>
-              <input
-                type="text"
-                className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={newPharmacy.nama_apotek}
-                onChange={(e) =>
-                  setNewPharmacy({
-                    ...newPharmacy,
-                    nama_apotek: e.target.value,
-                  })
-                }
-                placeholder="Input pharmacy name"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Pharmacy Logo
-              </label>
-              <div className="flex items-center gap-4">
-                <div className="relative w-16 h-16 rounded-lg bg-gray-50 dark:bg-zinc-600 overflow-hidden flex items-center justify-center">
-                  {newPharmacy.logo ? (
-                    <img
-                      src={newPharmacy.logo}
-                      alt="Logo preview"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <Camera size={24} className="text-gray-400" />
-                  )}
-                  {uploading && (
-                    <div className="absolute inset-0 bg-opacity-50 flex items-center justify-center">
-                      <Loader2 size={24} className="text-white animate-spin" />
-                    </div>
-                  )}
-                </div>
-                <button
-                  className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-zinc-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={triggerFileInput}
-                  disabled={uploading} // Cek apakah `id_apotek` ada
-                >
-                  {uploading ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    <Upload size={16} />
-                  )}
-                  <span>{uploading ? "Uploading..." : "Change logo"}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={handleAddPharmacy}
-              disabled={uploading || !newPharmacy.nama_apotek.trim()}
-            >
-              Save
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Pharmacy List */}
       <div className="space-y-4">
@@ -916,7 +816,10 @@ const MainStore = () => {
                               <button
                                 className="p-1 hover:text-red-500"
                                 onClick={() =>
-                                  handleDeleteBranch(pharmacy.id, branch.id)
+                                  handleDeleteBranch(
+                                    branch.id_cabang,
+                                    branch.id_apotek
+                                  )
                                 }
                               >
                                 <Trash2 size={14} />
@@ -971,6 +874,90 @@ const MainStore = () => {
             <button className="flex items-center gap-2 px-4 py-2 transition-colors">
               <BsPlusCircle size={28} />
             </button>
+          </div>
+        )}
+
+        {/* Add Pharmacy Form */}
+        {isAddingPharmacy && (
+          <div className="mb-6 p-6 border border-gray-100 rounded-lg">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">New Pharmacy</h3>
+              <button
+                className="text-red-400 hover:text-red-500"
+                onClick={() => setIsAddingPharmacy(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Pharmacy Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={newPharmacy.nama_apotek}
+                  onChange={(e) =>
+                    setNewPharmacy({
+                      ...newPharmacy,
+                      nama_apotek: e.target.value,
+                    })
+                  }
+                  placeholder="Input pharmacy name"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Pharmacy Logo
+                </label>
+                <div className="flex items-center gap-4">
+                  <div className="relative w-16 h-16 rounded-lg bg-gray-50 dark:bg-zinc-600 overflow-hidden flex items-center justify-center">
+                    {newPharmacy.logo ? (
+                      <img
+                        src={newPharmacy.logo}
+                        alt="Logo preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Camera size={24} className="text-gray-400" />
+                    )}
+                    {uploading && (
+                      <div className="absolute inset-0 bg-opacity-50 flex items-center justify-center">
+                        <Loader2
+                          size={24}
+                          className="text-white animate-spin"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-zinc-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={triggerFileInput}
+                    disabled={uploading} // Cek apakah `id_apotek` ada
+                  >
+                    {uploading ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <Upload size={16} />
+                    )}
+                    <span>{uploading ? "Uploading..." : "Change logo"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <button
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleAddPharmacy}
+                disabled={uploading || !newPharmacy.nama_apotek.trim()}
+              >
+                Save
+              </button>
+            </div>
           </div>
         )}
       </div>
