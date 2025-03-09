@@ -1022,7 +1022,7 @@ const TitleSection = ({ open }) => {
                   selectedApotekName !== null ? (
                   selectedApotekName
                 ) : (
-                  "Pilih Apotek"
+                  "Select a pharmacy"
                 )}
               </span>
 
@@ -1131,7 +1131,7 @@ const TitleSection = ({ open }) => {
                         ))
                       ) : (
                         <div className="px-4 py-3 text-center text-sm italic">
-                          Tidak ada cabang tersedia
+                          No branches available
                         </div>
                       )}
                     </div>
@@ -1140,7 +1140,7 @@ const TitleSection = ({ open }) => {
               ))
             ) : (
               <div className="grid justify-center items-center py-2 space-y-2">
-                <div className="text-sm">You don't have any stores</div>
+                <div className="text-sm">You don't have any pharmacy</div>
                 <div className="flex justify-center">
                   <button
                     onClick={() => router.push("/account")}
