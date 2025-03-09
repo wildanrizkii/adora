@@ -165,7 +165,7 @@ const ShuffleHero = () => {
           </a>
         </div> */}
               <Button
-                onClick={() => handleSubmit()}
+                htmlType="submit"
                 loading={isLoading}
                 className="w-full h-10 bg-emerald-700 text-white py-2 rounded-md text-sm hover:bg-emerald-800 transition-all"
               >
@@ -177,7 +177,7 @@ const ShuffleHero = () => {
                 plain={true}
                 style={{ borderColor: "#dedede", color: "#ababab" }}
               >
-                or
+                Or
               </Divider>
             </div>
             <div>
