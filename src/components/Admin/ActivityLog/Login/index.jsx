@@ -52,7 +52,7 @@ const logActivity = async ({ idUser, role, action, detail, userAgent }) => {
     ]);
 
     if (error) throw error;
-    // console.log("✅ Log aktivitas berhasil disimpan:", {
+    // console.log("Log aktivitas berhasil disimpan:", {
     //   idUser,
     //   action,
     //   role,
