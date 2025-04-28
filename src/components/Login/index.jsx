@@ -20,6 +20,7 @@ const ShuffleHero = () => {
   const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { setTheme, resolvedTheme } = useTheme();
 
   let { data: session } = useSession();
@@ -34,6 +35,7 @@ const ShuffleHero = () => {
 
   const handleSubmit = async () => {
     try {
+      setIsLoading(true);
       if (email.length >= 4 && password.length >= 4) {
         const response = await signIn("credentials", {
           email: email,
@@ -59,6 +61,8 @@ const ShuffleHero = () => {
       }
     } catch (error) {
       console.error("Error on routes", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -160,30 +164,36 @@ const ShuffleHero = () => {
             Forgot password?
           </a>
         </div> */}
-              <button
-                type="submit"
+              <Button
+                htmlType="submit"
+                loading={isLoading}
                 className="w-full h-10 bg-emerald-700 text-white py-2 rounded-md text-sm hover:bg-emerald-800 transition-all"
               >
                 Log in
-              </button>
+              </Button>
             </Form>
-            <div className="mt-6 text-center text-gray-400">
-              <Divider plain={true} style={{ borderColor: "#dedede" }}>
-                or
+            <div className="mt-4 text-center text-gray-400">
+              <Divider
+                plain={true}
+                style={{ borderColor: "#dedede", color: "#ababab" }}
+              >
+                Or
               </Divider>
             </div>
-            <Button
-              type="button"
-              //   onClick={handleCheck}
-              className="w-full h-10 border py-2 rounded-lg text-sm font-medium flex items-center justify-center space-x-2 bg-gray-100 hover:bg-gray-200 transition-all"
-            >
-              <img
-                src="/images/google-logo.png"
-                alt="Google"
-                className="w-4 h-4"
-              />
-              <span className="pb-0.5">Log in with Google</span>
-            </Button>
+            <div>
+              <Button
+                //   onClick={handleCheck}
+                className="w-full h-10 border py-2 rounded-lg text-sm font-medium flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-all cursor-not-allowed"
+                disabled
+              >
+                <img
+                  src="/images/google-logo.png"
+                  alt="Google"
+                  className="w-4 h-4"
+                />
+                <span className="pb-0.5 text-zinc-800">Log in with Google</span>
+              </Button>
+            </div>
             <Footer />
           </div>
         </div>

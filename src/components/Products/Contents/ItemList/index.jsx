@@ -52,6 +52,7 @@ const ItemList = () => {
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [detailDrawerOpen, setDetailDrawerOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const selectedCabang = sessionStorage.getItem("selectedCabang");
 
   useEffect(() => {
     setMounted(true);
@@ -230,11 +231,14 @@ const ItemList = () => {
 
   const fetchMaterial = async () => {
     try {
-      const { data, error } = await supabase.from("material").select("*");
-      const materialData = data.map((row, index) => ({
-        key: row.id_material,
+      const { data, error } = await supabase
+        .from("items")
+        .select("*")
+        .eq("id_cabang", sessionStorage.getItem("selectedCabang"));
+      const materialData = data?.map((row, index) => ({
+        key: row.id_item,
         no: index + 1 + ".",
-        nama: row.nama,
+        nama: row.nama_item,
       }));
       setInitialData(materialData);
     } catch (error) {
@@ -270,6 +274,10 @@ const ItemList = () => {
   useEffect(() => {
     setFilteredData(initialData);
   }, [initialData]);
+
+  useEffect(() => {
+    fetchMaterial();
+  }, [selectedCabang]);
 
   const handleSubmit = async (values) => {
     try {

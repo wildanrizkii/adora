@@ -1,6 +1,6 @@
 "use client";
 
-import { Line } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 import { useEffect, useState } from "react";
 import supabase from "@/app/utils/db";
 import dayjs from "dayjs";
@@ -20,9 +20,9 @@ const LoginChart = () => {
       const { data, error } = await supabase
         .from("log_activity")
         .select("times")
-        // Filter berdasarkan periode yang dipilih
         .gte("times", `${start}T00:00:00`)
-        .lte("times", `${end}T23:59:59`);
+        .lte("times", `${end}T23:59:59`)
+        .eq("action", "Login");
 
       if (error) throw error;
 
@@ -320,7 +320,7 @@ const LoginChart = () => {
           </div>
         )}
 
-        <Line data={chartData} options={options} />
+        <Bar data={chartData} options={options} />
       </div>
     </div>
   );

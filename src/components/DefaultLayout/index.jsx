@@ -4,7 +4,7 @@ import { useMediaQuery } from "react-responsive";
 import Link from "next/link";
 import dayjs from "dayjs";
 import "dayjs/locale/id";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   FiBarChart,
   FiChevronDown,
@@ -22,9 +22,11 @@ import {
   FiShare,
   FiPlusSquare,
 } from "react-icons/fi";
-import { Avatar, Space, Dropdown, Badge, Tabs, Spin } from "antd";
+import { Avatar, Space, Dropdown, Badge, Tabs, Spin, Modal } from "antd";
 import { AiOutlineProduct, AiOutlineLogout } from "react-icons/ai";
+import { PiSignOutBold } from "react-icons/pi";
 import { FaRegFileAlt, FaCloud } from "react-icons/fa";
+import { AiOutlinePlus } from "react-icons/ai";
 import { WiStars } from "react-icons/wi";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -41,6 +43,7 @@ import { Moon, Sun } from "lucide-react";
 import { signOut } from "next-auth/react";
 import supabase from "@/app/utils/db";
 import DashboardAdmin from "@/components/Admin/Dashboard";
+import AccountPage from "@/components/Account";
 
 dayjs.locale("id");
 
@@ -105,6 +108,8 @@ const DefaultLayout = ({ title, content }) => {
                 !isReady ? null : title === "Dashboard" &&
                   session?.user?.role === "Admin" ? (
                   <DashboardAdmin />
+                ) : title === "Accounts" && session?.user?.role === "Owner" ? (
+                  <AccountPage />
                 ) : (
                   content
                 )
@@ -149,6 +154,16 @@ const Header = () => {
     return dayjs().format("dddd, D MMMM YYYY");
   };
 
+  function getInitials(name) {
+    if (!name) return "";
+    const words = name.trim().split(/\s+/);
+    if (words.length === 1) {
+      return words[0][0].toUpperCase();
+    } else {
+      return words[0][0].toUpperCase() + words[1][0].toUpperCase();
+    }
+  }
+
   const ringAnimation = {
     initial: { rotate: 0 },
     animate: isHovering
@@ -179,7 +194,7 @@ const Header = () => {
       }`}
       transition={{ duration: 0.6, ease: "easeInOut" }}
     >
-      <h1 className="font-medium text-xs sm:text-lg line-clamp-2">
+      <h1 className="font-medium text-xs sm:text-lg line-clamp-2 mr-2">
         {getFormattedDate()}
       </h1>
 
@@ -268,72 +283,134 @@ const Header = () => {
               trigger={["click"]}
               placement="bottomRight"
               arrow
-              className="rounded-full shadow-lg"
+              className="rounded-full"
               dropdownRender={() => {
                 return (
-                  <div
-                    className="cursor-default bg-white dark:bg-zinc-700 rounded-md p-6 shadow-lg min-w-xs border"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="flex justify-center mb-4">
-                      {true?.user?.image ? (
-                        <Avatar
-                          shape="circle"
-                          size={80}
-                          src={
-                            "https://api.dicebear.com/9.x/miniavs/svg?backgroundType=gradientLinear,solid"
-                          }
-                          className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
-                        />
-                      ) : (
-                        <Avatar
-                          shape="circle"
-                          size={80}
-                          src={
-                            "https://api.dicebear.com/9.x/miniavs/svg?backgroundType=gradientLinear,solid"
-                          }
-                          className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
-                        />
-                      )}
+                  <div className="min-w-fit w-72 bg-white dark:bg-zinc-700 dark:text-white rounded-lg shadow-lg border border-gray-200">
+                    {/* Header with Logo and Website */}
+                    <div className="p-4 border-b border-gray-200 flex items-center">
+                      <div className="h-10 w-10 bg-indigo-400 rounded-full flex items-center justify-center mr-3">
+                        <span className="text-lg text-white">
+                          {getInitials(session?.user?.name)}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="font-medium">{session?.user?.name}</h3>
+                        <p className="text-sm">{session?.user?.email}</p>
+                      </div>
                     </div>
-                    <div className="space-y-8">
-                      <div
-                        className="cursor-default text-center"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <h1 className="font-semibold dark:text-white">
-                          {session?.user?.name}
-                        </h1>
-                        <h1 className="font-normal dark:text-white">
-                          {session?.user?.role}
-                        </h1>
+
+                    {/* Navigation Menu */}
+                    <div className="py-2 cursor-pointer">
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+                          <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" />
+                        </svg>
+                        <span>Dashboard</span>
                       </div>
 
-                      <div className="flex space-x-2">
-                        <Link href="/pengaturan/akun" className="flex-grow">
-                          <div className="flex shadow-md justify-center items-center p-3 gap-1 border text-indigo-600 hover:text-white bg-indigo-600 border-indigo-600 hover:border-indigo-700 hover:bg-indigo-700 rounded-md cursor-pointer transition-colors h-full">
-                            {/* <SettingOutlined /> */}
-                            <h1 className="mb-0.5 text-white ">
-                              Pengaturan Akun
-                            </h1>
-                          </div>
-                        </Link>
-                        <div
-                          className="flex shadow-md w-14 justify-center items-center p-4 gap-1 text-white text-lg bg-red-500 hover:bg-red-600 rounded-md cursor-pointer transition-colors"
-                          onClick={() => {
-                            signOut();
-                            clearSessionSelections(); //Jika setelah Logout perlu pilih ulang cabang
-                          }}
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
                         >
-                          <FiLogOut />
+                          <path
+                            fillRule="evenodd"
+                            d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>Settings</span>
+                      </div>
+
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                        <span>Plugins</span>
+                      </div>
+
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>API Documentation</span>
+                      </div>
+
+                      <div className="px-4 py-2 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-3"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span>Help Center</span>
+                      </div>
+                    </div>
+
+                    {/* Plan Information */}
+                    {session?.user?.role === "Owner" ? (
+                      <div className="px-4 py-3 border-t border-gray-200">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium">Starter Plan</p>
+                            <p className="text-xs text-indigo-600 dark:text-indigo-400">
+                              29% OFF
+                            </p>
+                          </div>
+                          <button className="px-4 py-1 text-sm border border-gray-300 rounded-md bg-white dark:bg-zinc-500 hover:bg-gray-50 dark:hover:bg-zinc-600 transition-color">
+                            Upgrade
+                          </button>
                         </div>
+                      </div>
+                    ) : null}
+
+                    {/* Sign Out */}
+                    <div
+                      onClick={() => {
+                        signOut();
+                        clearSessionSelections(); //Jika setelah Logout perlu pilih ulang cabang
+                      }}
+                      className="px-4 py-3 border-t border-gray-200 rounded-b-lg hover:bg-zinc-50 dark:hover:bg-zinc-600 cursor-pointer"
+                    >
+                      <div className="flex items-center text-md gap-2">
+                        <FiLogOut size={19} />
+                        <span>Sign out</span>
                       </div>
                     </div>
                   </div>
                 );
               }}
             >
-              <Avatar
+              {/* <Avatar
                 shape="circle"
                 size={42}
                 src={
@@ -342,7 +419,15 @@ const Header = () => {
                 style={{ cursor: "pointer" }}
                 onClick={(e) => e.stopPropagation()}
                 className="rounded-full bg-zinc-300 dark:bg-white shadow-md shadow-zinc-200 dark:shadow-zinc-800"
-              />
+              /> */}
+
+              <div className="h-11 w-11 cursor-pointer">
+                <div className="h-full w-full rounded-full bg-indigo-500 flex items-center justify-center pb-0.5">
+                  <span className="pt-0.5 text-md text-white">
+                    {getInitials(session?.user?.name)}
+                  </span>
+                </div>
+              </div>
             </Dropdown>
           </motion.span>
           {/* <motion.div
@@ -367,16 +452,211 @@ const clearSessionSelections = () => {
 };
 
 const Footer = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: "", content: "" });
+
+  const handleOpenModal = (title, content) => {
+    setModalContent({ title, content });
+    setIsModalOpen(true);
+  };
+
   return (
-    <motion.footer
-      layout
-      className="h-6 bg-transparent shadow-sm flex items-center justify-center mt-auto"
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-    >
-      <p className="text-xs">
-        &copy; 2025 Adora Pharmacy. All rights reserved.
-      </p>
-    </motion.footer>
+    <>
+      <motion.footer
+        layout
+        className="h-6 bg-transparent shadow-sm flex items-center justify-center mt-auto"
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+      >
+        <div className="flex text-xs text-start gap-2 px-6 sm:px-0">
+          &copy; 2025 Adora Pharmacy. All rights reserved.
+          <div className="text-end space-x-2">
+            <button
+              className="underline hover:text-blue-500"
+              onClick={() =>
+                handleOpenModal(
+                  "Terms of Service",
+                  <div>
+                    <h2 className="text-lg font-semibold mb-2">
+                      Login Activity
+                    </h2>
+                    <ul className="list-disc pl-5 mb-4">
+                      <li>
+                        Records user login times to track the last time an
+                        account was accessed.
+                      </li>
+                      <li>
+                        Stores browser information used during login to detect
+                        anomalies (e.g., logins from unknown devices).
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mb-2">
+                      Profile Changes
+                    </h2>
+                    <ul className="list-disc pl-5 mb-4">
+                      <li>
+                        Logs any changes to account details, such as name or
+                        email updates.
+                      </li>
+                      <li>
+                        Ensures a change history is available for review if
+                        needed.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mb-2">
+                      Suspicious Activity (Failed Login Attempts)
+                    </h2>
+                    <ul className="list-disc pl-5 mb-4">
+                      <li>
+                        If someone attempts to log in with the correct
+                        username/email but an incorrect password, the system
+                        will record:
+                      </li>
+                      <ul className="list-disc pl-6">
+                        <li>The IP address of the device used.</li>
+                        <li>The browser used for the login attempt.</li>
+                        <li>
+                          The time of the login attempt to identify potential
+                          attack patterns.
+                        </li>
+                      </ul>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mb-2">
+                      Purpose of This Logging
+                    </h2>
+                    <ul className="list-disc pl-5">
+                      <li>
+                        <strong>Security</strong>: Prevents unauthorized access
+                        to user accounts.
+                      </li>
+                      <li>
+                        <strong>Monitoring</strong>: Allows users and admins to
+                        review login history & account changes.
+                      </li>
+                      <li>
+                        <strong>Early Detection</strong>: If suspicious activity
+                        occurs, the system can issue warnings or take security
+                        actions.
+                      </li>
+                    </ul>
+                  </div>
+                )
+              }
+            >
+              Terms of Service
+            </button>
+
+            <button
+              className="underline hover:text-blue-500"
+              onClick={() =>
+                handleOpenModal(
+                  "Privacy Policy",
+                  <div className="max-w-3xl mx-auto">
+                    <p>
+                      This Privacy Policy explains how we collect, use, and
+                      protect your data when using our website.
+                    </p>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      1. Information We Collect
+                    </h2>
+                    <p>We collect the following types of user data:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Identity Data: Name, email, and login details.</li>
+                      <li>
+                        Activity Data: Login records, profile changes, and
+                        failed login attempts.
+                      </li>
+                      <li>
+                        Device Data: IP address, browser type, and access time.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      2. How We Use Your Data
+                    </h2>
+                    <p>We use the collected data for:</p>
+                    <ul className="list-disc list-inside">
+                      <li>
+                        Security: Preventing unauthorized access and misuse of
+                        accounts.
+                      </li>
+                      <li>
+                        Monitoring: Tracking login history and profile changes.
+                      </li>
+                      <li>
+                        Service Improvement: Enhancing features based on user
+                        feedback.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      3. Data Storage and Protection
+                    </h2>
+                    <p>We take the following measures to secure your data:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Data is stored securely using encryption.</li>
+                      <li>
+                        We do not share personal data with third parties without
+                        consent.
+                      </li>
+                      <li>
+                        Only authorized admins can access security-related
+                        information.
+                      </li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      4. User Rights
+                    </h2>
+                    <p>Users have the right to:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Access their stored personal data.</li>
+                      <li>Request account and data deletion.</li>
+                      <li>Modify personal information at any time.</li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      5. Use of Cookies
+                    </h2>
+                    <p>We use cookies to:</p>
+                    <ul className="list-disc list-inside">
+                      <li>Store user preferences for a better experience.</li>
+                      <li>Track login activity to improve security.</li>
+                    </ul>
+
+                    <h2 className="text-lg font-semibold mt-4">
+                      6. Changes to Privacy Policy
+                    </h2>
+                    <p>
+                      This Privacy Policy may change over time. Users will be
+                      notified of any significant updates.
+                    </p>
+                    <p className="mt-4">Last updated: 01/03/2025</p>
+                  </div>
+                )
+              }
+            >
+              Privacy Policy
+            </button>
+          </div>
+        </div>
+      </motion.footer>
+
+      {/* Modal */}
+      <div className="max-h-32 overflow-auto">
+        <Modal
+          title={modalContent.title}
+          open={isModalOpen}
+          onCancel={() => setIsModalOpen(false)}
+          footer={null}
+        >
+          <div>{modalContent.content}</div>
+        </Modal>
+      </div>
+    </>
   );
 };
 
@@ -392,12 +672,12 @@ const menuItems = {
     },
     { title: "Suppliers", icon: FiBox, path: "/suppliers" },
     { title: "Transactions", icon: FiTag, path: "/transactions" },
-    { title: "Report", icon: FaRegFileAlt, path: "/report" },
-    { title: "Account", icon: FiUsers, path: "/account" },
+    { title: "Reports", icon: FaRegFileAlt, path: "/reports" },
+    { title: "Accounts", icon: FiUsers, path: "/account" },
   ],
   Admin: [
     { title: "Dashboard", icon: LuLayoutDashboard, path: "/" },
-    { title: "Account", icon: FiUsers, path: "/account" },
+    { title: "Accounts", icon: FiUsers, path: "/account" },
   ],
   Karyawan: [{ title: "Cashier", icon: FiShoppingCart, path: "/cashier" }],
 };
@@ -521,7 +801,6 @@ const Option = ({ Icon, title, path, selected, setSelected, open, notifs }) => {
 };
 
 const TitleSection = ({ open }) => {
-  const { resolvedTheme } = useTheme();
   const [apotekData, setApotekData] = useState({});
   const [cabangData, setCabangData] = useState({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -529,20 +808,47 @@ const TitleSection = ({ open }) => {
   const [selectedCabang, setSelectedCabang] = useState(null);
   const [selectedApotekName, setSelectedApotekName] = useState(null);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
   let { data: session } = useSession();
 
-  const handleSelectApotek = (id_apotek) => {
+  const handleSelectApotek = async (id_apotek) => {
     if (selectedApotek === id_apotek) {
+      // console.log("Menghapus apotek dari sessionStorage");
       setSelectedApotek(null);
+      setSelectedCabang(null);
+      setCabangData({});
+      sessionStorage.removeItem("selectedApotek");
+      sessionStorage.removeItem("selectedCabang");
     } else {
+      // console.log("Menyimpan apotek ke sessionStorage:", id_apotek);
       setSelectedApotek(id_apotek);
-      fetchCabang(id_apotek);
+      setSelectedApotekName(apotekData[id_apotek]?.nama);
+
+      const { data } = await supabase
+        .from("cabang")
+        .select("*")
+        .eq("id_apotek", id_apotek)
+        .order("nama_cabang", { ascending: true }); // Tambahkan sorting
+
+      if (data.length > 0) {
+        const firstCabang = data[0];
+        setSelectedCabang(firstCabang.id_cabang);
+        sessionStorage.setItem("selectedCabang", firstCabang.id_cabang);
+      }
+
+      const cabangObject = data.reduce((acc, row) => {
+        acc[row.id_cabang] = { nama: row.nama_cabang };
+        return acc;
+      }, {});
+
+      setCabangData(cabangObject);
     }
   };
 
   const handleSelectCabang = (id_cabang) => {
     setSelectedCabang(id_cabang);
     setIsDropdownOpen(false);
+    window.location.reload();
   };
 
   const fetchApotek = async () => {
@@ -564,30 +870,33 @@ const TitleSection = ({ open }) => {
       console.error("Error while fetching data Apotek: ", error.message);
     }
   };
+  //   try {
+  //     const { data, error } = await supabase
+  //       .from("cabang")
+  //       .select("*")
+  //       .eq("id_apotek", id_apotek);
 
-  const fetchCabang = async (id_apotek) => {
-    try {
-      const { data, error } = await supabase
-        .from("cabang")
-        .select("*")
-        .eq("id_apotek", id_apotek);
+  //     if (error) throw error;
 
-      if (error) throw error;
+  //     const cabangObject = data.reduce((acc, row) => {
+  //       acc[row.id_cabang] = { nama: row.nama_cabang };
+  //       return acc;
+  //     }, {});
 
-      const cabangObject = data.reduce((acc, row) => {
-        acc[row.id_cabang] = {
-          nama: row.nama_cabang,
-          // Simpan data tambahan cabang jika diperlukan
-        };
-        return acc;
-      }, {});
+  //     setCabangData(cabangObject);
 
-      setCabangData(cabangObject);
-    } catch (error) {
-      console.error("Error while fetching data Cabang Apotek: ", error);
-      // Tambahkan handling error yang sesuai
-    }
-  };
+  //     // Otomatis pilih cabang pertama jika ada
+  //     if (data.length > 0) {
+  //       setSelectedCabang(data[0].id_cabang);
+  //       sessionStorage.setItem("selectedCabang", data[0].id_cabang);
+  //     } else {
+  //       setSelectedCabang(null);
+  //       sessionStorage.removeItem("selectedCabang");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error while fetching data Cabang Apotek: ", error);
+  //   }
+  // };
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -605,18 +914,54 @@ const TitleSection = ({ open }) => {
 
       if (savedApotek) {
         setSelectedApotek(savedApotek);
-        fetchCabang(savedApotek);
-      }
+        setSelectedApotekName(savedApotekName || "");
 
-      if (savedApotekName) {
-        setSelectedApotekName(savedApotekName);
-      }
-
-      if (savedCabang) {
-        setSelectedCabang(savedCabang);
+        fetchAndSelectCabang(savedApotek, savedCabang);
       }
     }
-  }, [session]);
+  }, [session]); // Pastikan hanya berjalan saat session berubah
+
+  // Pindahkan fungsi fetch di luar useEffect
+  const fetchAndSelectCabang = async (id_apotek, savedCabang) => {
+    // console.log("Fetching cabang untuk apotek:", id_apotek);
+    const { data } = await supabase
+      .from("cabang")
+      .select("*")
+      .eq("id_apotek", id_apotek)
+      .order("nama_cabang", { ascending: true });
+
+    // console.log("Data cabang yang diambil:", data);
+
+    if (data.length > 0) {
+      const firstCabang = savedCabang || data[0].id_cabang;
+      // console.log("Cabang yang dipilih setelah fetch:", firstCabang);
+
+      sessionStorage.setItem("selectedCabang", firstCabang);
+      setSelectedCabang(firstCabang);
+    } else {
+      // console.log("Tidak ada cabang tersedia untuk apotek ini.");
+
+      // 🔴 Hapus sessionStorage jika tidak ada cabang
+      sessionStorage.removeItem("selectedCabang");
+      setSelectedCabang(null);
+    }
+
+    const cabangObject = data.reduce((acc, row) => {
+      acc[row.id_cabang] = { nama: row.nama_cabang };
+      return acc;
+    }, {});
+    setCabangData(cabangObject);
+  };
+
+  // ✅ Tambahkan useEffect ini untuk membaca ulang sessionStorage setelah fetch selesai
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const updatedCabang = sessionStorage.getItem("selectedCabang");
+      if (updatedCabang) {
+        setSelectedCabang(updatedCabang);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (selectedApotek) {
@@ -626,6 +971,9 @@ const TitleSection = ({ open }) => {
       sessionStorage.removeItem("selectedApotek");
       sessionStorage.removeItem("selectedApotekName");
     }
+    // console.log("Session Storage saat halaman dimuat:");
+    // console.log("selectedApotek:", sessionStorage.getItem("selectedApotek"));
+    // console.log("selectedCabang:", sessionStorage.getItem("selectedCabang"));
   }, [selectedApotek]);
 
   useEffect(() => {
@@ -653,7 +1001,7 @@ const TitleSection = ({ open }) => {
       <div className="relative mb-3 border-b border-slate-300">
         {/* Main Dropdown Trigger */}
         <div
-          className={`flex items-center justify-between rounded-lg transition-all duration-200 p-2.5 mx-1 ${
+          className={`flex items-center justify-between rounded-lg transition-all duration-200 p-2 mx-1 ${
             session?.user?.role === "Admin" ? "" : "cursor-pointer"
           }`}
           onClick={() =>
@@ -670,8 +1018,11 @@ const TitleSection = ({ open }) => {
               <span className="block text-sm font-semibold">
                 {session?.user?.role === "Admin" ? (
                   <div>Admin</div>
+                ) : selectedApotekName !== undefined &&
+                  selectedApotekName !== null ? (
+                  selectedApotekName
                 ) : (
-                  selectedApotekName || "Pilih Apotek"
+                  "Select a pharmacy"
                 )}
               </span>
 
@@ -710,89 +1061,96 @@ const TitleSection = ({ open }) => {
             style={{ originY: "top", translateX: "-50%" }}
           >
             {/* Apotek List */}
-            {Object.keys(apotekData).map((apotekKey) => (
-              <div key={apotekKey} className="relative group">
-                {/* Apotek Item */}
-                <div
-                  className="px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-400 group"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (selectedApotek === apotekKey) {
-                      setSelectedApotek(null); // Collapse if already expanded
-                    } else {
-                      setSelectedApotek(apotekKey);
-                      fetchCabang(apotekKey);
-                      setSelectedApotekName(
-                        apotekData[Object.keys(apotekData)[apotekKey - 1]].nama
-                      );
-                    }
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0">
-                        <Logo />
-                      </div>
-                      <span className="font-medium">
-                        {apotekData[apotekKey]?.nama}
-                      </span>
-                    </div>
-                    <motion.div
-                      animate={{
-                        rotate: selectedApotek === apotekKey ? 45 : 0,
-                      }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <HiMiniChevronUpDown size={16} />
-                    </motion.div>
-                  </div>
-                </div>
-
-                {/* Animated Cabang Submenu */}
-                <motion.div
-                  initial={false}
-                  animate={{
-                    height: selectedApotek === apotekKey ? "auto" : 0,
-                    opacity: selectedApotek === apotekKey ? 1 : 0,
-                  }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <div className="pl-4 mt-1">
-                    {Object.keys(cabangData).length > 0 ? (
-                      Object.keys(cabangData).map((cabangKey) => (
-                        <div
-                          key={cabangKey}
-                          className={`px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-indigo-200 dark:hover:bg-indigo-300
-                  ${
-                    selectedCabang === cabangKey
-                      ? "bg-indigo-300 dark:bg-indigo-400"
-                      : ""
-                  }`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleSelectCabang(cabangKey);
-                          }}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="flex-shrink-0">
-                              <BsShop className="text-lg" />
-                            </div>
-                            <span className="font-medium">
-                              {cabangData[cabangKey]?.nama}
-                            </span>
-                          </div>
+            {Object.keys(apotekData).length > 0 ? (
+              Object.keys(apotekData).map((apotekKey) => (
+                <div key={apotekKey} className="relative group">
+                  {/* Apotek Item */}
+                  <div
+                    className="px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-zinc-200 dark:hover:bg-zinc-400 group"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelectApotek(apotekKey);
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0">
+                          <Logo />
                         </div>
-                      ))
-                    ) : (
-                      <div className="px-4 py-3 text-center text-sm italic">
-                        Tidak ada cabang tersedia
+                        <span className="font-medium">
+                          {apotekData[apotekKey]?.nama}
+                        </span>
                       </div>
-                    )}
+                      <motion.div
+                        animate={{
+                          rotate: selectedApotek === apotekKey ? 45 : 0,
+                        }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <HiMiniChevronUpDown size={16} />
+                      </motion.div>
+                    </div>
                   </div>
-                </motion.div>
+
+                  {/* Animated Cabang Submenu */}
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      height: selectedApotek === apotekKey ? "auto" : 0,
+                      opacity: selectedApotek === apotekKey ? 1 : 0,
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pl-4 mt-1">
+                      {Object.keys(cabangData).length > 0 ? (
+                        Object.keys(cabangData).map((cabangKey) => (
+                          <div
+                            key={cabangKey}
+                            className={`px-3 py-2.5 mx-2 text-left text-sm cursor-pointer rounded-lg transition-all duration-200 hover:bg-indigo-200 dark:hover:bg-indigo-300
+                ${
+                  selectedCabang === cabangKey
+                    ? "bg-indigo-300 dark:bg-indigo-400"
+                    : ""
+                }`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSelectCabang(cabangKey);
+                              router.prefetch("/products");
+                            }}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="flex-shrink-0">
+                                <BsShop className="text-lg" />
+                              </div>
+                              <span className="font-medium">
+                                {cabangData[cabangKey]?.nama}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="px-4 py-3 text-center text-sm italic">
+                          No branches available
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                </div>
+              ))
+            ) : (
+              <div className="grid justify-center items-center py-2 space-y-2">
+                <div className="text-sm">You don't have any pharmacy</div>
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => router.push("/account")}
+                    className="flex items-center justify-center gap-1 px-4 pb-1.5 pt-1 shadow-md bg-emerald-600 text-sm text-white rounded-md hover:bg-emerald-700 transition-all"
+                  >
+                    <AiOutlinePlus size={14} /> Add Store
+                  </button>
+                </div>
               </div>
-            ))}
+            )}
           </motion.div>
         )}
       </div>
